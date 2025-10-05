@@ -2,19 +2,22 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 from ..core.database import get_db
+from ..core.auth_deps import get_current_active_user, require_rrhh_or_admin
 from ..models.document import Document
+from ..models.user import User
+from ..models.role import Role
 from ..schemas.document import DocumentCreate, DocumentUpdate, DocumentResponse
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
-# CREATE - Crear nuevo documento
+# CREATE - Crear nuevo documento (usuario crea para sí mismo)
 @router.post("/", response_model=DocumentResponse, status_code=status.HTTP_201_CREATED)
-def create_document(document: DocumentCreate, db: Session = Depends(get_db)):
+def create_document(document: DocumentCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)):
     db_document = Document(
         titulo=document.titulo,
         tipo_documento=document.tipo_documento,
         ruta_archivo=document.ruta_archivo,
-        usuario_id=document.usuario_id,
+        usuario_id=current_user.id,  # Usar el ID del usuario actual
         estado=document.estado,
         observaciones=document.observaciones
     )
@@ -24,10 +27,19 @@ def create_document(document: DocumentCreate, db: Session = Depends(get_db)):
     db.refresh(db_document)
     return db_document
 
-# READ - Obtener todos los documentos
+# READ - Obtener documentos (usuario ve solo los suyos, RRHH/Admin ven todos)
 @router.get("/", response_model=List[DocumentResponse])
-def get_documents(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    documents = db.query(Document).offset(skip).limit(limit).all()
+def get_documents(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)):
+    # Obtener rol del usuario
+    user_role = db.query(Role).filter(Role.id == current_user.rol_id).first()
+    
+    # Si es RRHH o Admin, puede ver todos los documentos
+    if user_role and user_role.nombre_rol in ["RRHH", "Administración"]:
+        documents = db.query(Document).offset(skip).limit(limit).all()
+    else:
+        # Usuario normal solo ve sus documentos
+        documents = db.query(Document).filter(Document.usuario_id == current_user.id).offset(skip).limit(limit).all()
+    
     return documents
 
 # READ - Obtener documento por ID

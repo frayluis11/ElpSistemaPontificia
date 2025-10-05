@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 from ..core.database import get_db
+from ..core.auth_deps import get_current_active_user, require_admin_or_ti, require_rrhh_or_admin
 from ..models.user import User
 from ..schemas.user import UserCreate, UserUpdate, UserResponse
 from passlib.context import CryptContext
@@ -9,9 +10,9 @@ from passlib.context import CryptContext
 router = APIRouter(prefix="/users", tags=["users"])
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# CREATE - Crear nuevo usuario
+# CREATE - Crear nuevo usuario (solo Admin o TI)
 @router.post("/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-def create_user(user: UserCreate, db: Session = Depends(get_db)):
+def create_user(user: UserCreate, db: Session = Depends(get_db), current_user: User = Depends(require_admin_or_ti)):
     # Verificar si el DNI ya existe
     db_user = db.query(User).filter(User.dni == user.dni).first()
     if db_user:
@@ -46,9 +47,9 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     db.refresh(db_user)
     return db_user
 
-# READ - Obtener todos los usuarios
+# READ - Obtener todos los usuarios (solo RRHH o Admin)
 @router.get("/", response_model=List[UserResponse])
-def get_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def get_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user: User = Depends(require_rrhh_or_admin)):
     users = db.query(User).offset(skip).limit(limit).all()
     return users
 
@@ -62,6 +63,11 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
             detail="Usuario no encontrado"
         )
     return user
+
+# READ - Obtener perfil del usuario actual
+@router.get("/me", response_model=UserResponse)
+def get_current_user_profile(current_user: User = Depends(get_current_active_user)):
+    return current_user
 
 # READ - Obtener usuario por DNI
 @router.get("/dni/{dni}", response_model=UserResponse)
@@ -93,9 +99,9 @@ def update_user(user_id: int, user_update: UserUpdate, db: Session = Depends(get
     db.refresh(user)
     return user
 
-# DELETE - Eliminar usuario
+# DELETE - Eliminar usuario (solo Admin o TI)
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_user(user_id: int, db: Session = Depends(get_db)):
+def delete_user(user_id: int, db: Session = Depends(get_db), current_user: User = Depends(require_admin_or_ti)):
     user = db.query(User).filter(User.id == user_id).first()
     if user is None:
         raise HTTPException(

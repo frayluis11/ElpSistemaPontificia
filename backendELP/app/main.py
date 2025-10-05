@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from app.core.database import get_db, engine, create_tables
-from app.routers import user_router, role_router, document_router, hours_router
+from app.routers import user_router, role_router, document_router, hours_router, auth, dashboard
 from dotenv import load_dotenv
 import os
 
@@ -12,8 +12,8 @@ load_dotenv()
 # Crear instancia de FastAPI
 app = FastAPI(
     title="Sistema ELP Pontificia API",
-    description="Backend del Sistema ELP Pontificia con FastAPI y PostgreSQL",
-    version="1.0.0"
+    description="Backend del Sistema ELP Pontificia con FastAPI, PostgreSQL, JWT Auth y Roles",
+    version="2.0.0"
 )
 
 # Crear tablas al iniciar la aplicación
@@ -22,10 +22,12 @@ async def startup_event():
     create_tables()
 
 # Incluir routers
-app.include_router(user_router.router)
-app.include_router(role_router.router)
-app.include_router(document_router.router)
-app.include_router(hours_router.router)
+app.include_router(auth.router)  # Autenticación (no requiere auth)
+app.include_router(dashboard.router)  # Dashboards (requiere auth)
+app.include_router(user_router.router)  # CRUD usuarios
+app.include_router(role_router.router)  # CRUD roles
+app.include_router(document_router.router)  # CRUD documentos
+app.include_router(hours_router.router)  # CRUD horas
 
 @app.get("/")
 async def root():

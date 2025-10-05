@@ -3,7 +3,10 @@ from sqlalchemy.orm import Session
 from typing import List
 from datetime import date
 from ..core.database import get_db
+from ..core.auth_deps import get_current_active_user, require_rrhh_or_admin
 from ..models.hours import Hours
+from ..models.user import User
+from ..models.role import Role
 from ..schemas.hours import HoursCreate, HoursUpdate, HoursResponse
 
 router = APIRouter(prefix="/hours", tags=["hours"])
