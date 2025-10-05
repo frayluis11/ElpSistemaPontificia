@@ -1,228 +1,185 @@
-import React, { useState, useEffect } from 'react';
-import { systemAPI } from '../services/api';
+import React from 'react';
+import { ArrowRight, Users, FileText, Clock, BarChart3, Shield, Award } from 'lucide-react';
+import { Button, Card, CardGrid } from '../components/ui';
 
+/**
+ * Página Home del Sistema ELP Pontificia
+ * Página de bienvenida con información general del sistema
+ */
 const Home = () => {
-  const [systemInfo, setSystemInfo] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const features = [
+    {
+      icon: Users,
+      title: 'Gestión de Personal',
+      description: 'Administra información completa del personal docente y administrativo',
+      color: 'text-blue-600'
+    },
+    {
+      icon: FileText,
+      title: 'Documentos Digitales',
+      description: 'Sistema centralizado de gestión documental con firma digital',
+      color: 'text-green-600'
+    },
+    {
+      icon: Clock,
+      title: 'Control de Horas',
+      description: 'Registro y seguimiento de horas trabajadas con reportes automáticos',
+      color: 'text-orange-600'
+    },
+    {
+      icon: BarChart3,
+      title: 'Reportes y Analytics',
+      description: 'Dashboards interactivos con métricas y KPIs en tiempo real',
+      color: 'text-purple-600'
+    },
+    {
+      icon: Shield,
+      title: 'Seguridad Avanzada',
+      description: 'Autenticación robusta y control de acceso por roles',
+      color: 'text-red-600'
+    },
+    {
+      icon: Award,
+      title: 'Excelencia Académica',
+      description: 'Herramientas diseñadas para la excelencia educativa pontificia',
+      color: 'text-yellow-600'
+    }
+  ];
 
-  useEffect(() => {
-    const fetchSystemInfo = async () => {
-      try {
-        const response = await systemAPI.getInfo();
-        setSystemInfo(response.data);
-      } catch (err) {
-        console.log('Backend no disponible, mostrando información estática');
-        setError('Backend no disponible');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSystemInfo();
-  }, []);
+  const stats = [
+    { number: '500+', label: 'Usuarios Activos', color: 'text-blue-600' },
+    { number: '10K+', label: 'Documentos Gestionados', color: 'text-green-600' },
+    { number: '24/7', label: 'Disponibilidad', color: 'text-orange-600' },
+    { number: '99.9%', label: 'Uptime', color: 'text-purple-600' }
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">ELP</span>
-                </div>
-              </div>
-              <div className="ml-4">
-                <h1 className="text-2xl font-bold text-gray-900">
-                  Sistema ELP Pontificia
-                </h1>
-                <p className="text-sm text-gray-500">
-                  Frontend React + Vite + Tailwind CSS
-                </p>
+    <div className="min-h-screen bg-background">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary-800 via-primary-700 to-secondary-800 text-white">
+        <div className="absolute inset-0 bg-black opacity-20"></div>
+        <div className="relative max-w-7xl mx-auto px-6 py-20 sm:py-32">
+          <div className="text-center">
+            <div className="flex justify-center mb-8">
+              <div className="w-20 h-20 bg-accent-400 rounded-2xl flex items-center justify-center">
+                <span className="text-3xl font-bold text-primary-800">ELP</span>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                Frontend Iniciado
-              </span>
+            
+            <h1 className="text-4xl sm:text-6xl font-bold mb-6">
+              Sistema ELP
+              <span className="block text-accent-400">Pontificia Universidad</span>
+            </h1>
+            
+            <p className="text-xl sm:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto">
+              Plataforma integral de gestión académica y administrativa diseñada 
+              para la excelencia educativa pontificia
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                size="lg" 
+                className="bg-accent-400 text-primary-800 hover:bg-accent-300 font-semibold"
+              >
+                Acceder al Sistema
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+              <Button 
+                variant="secondary" 
+                size="lg"
+                className="text-white border-white hover:bg-white hover:text-primary-800"
+              >
+                Conocer Más
+              </Button>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Sistema ELP Pontificia - Frontend Iniciado
+      {/* Stats Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center">
+                <div className={`text-3xl sm:text-4xl font-bold ${stat.color} mb-2`}>
+                  {stat.number}
+                </div>
+                <div className="text-text-secondary font-medium">
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 bg-background">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">
+              Funcionalidades Principales
+            </h2>
+            <p className="text-xl text-text-secondary max-w-3xl mx-auto">
+              Un sistema completo diseñado para optimizar la gestión académica y administrativa
+            </p>
+          </div>
+
+          <CardGrid cols={3} gap="lg">
+            {features.map((feature, index) => {
+              const IconComponent = feature.icon;
+              return (
+                <Card 
+                  key={index}
+                  hover
+                  className="text-center h-full"
+                >
+                  <div className="flex flex-col items-center space-y-4">
+                    <div className={`w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center ${feature.color}`}>
+                      <IconComponent className="w-8 h-8" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-text-primary">
+                      {feature.title}
+                    </h3>
+                    <p className="text-text-secondary">
+                      {feature.description}
+                    </p>
+                  </div>
+                </Card>
+              );
+            })}
+          </CardGrid>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-primary-800 text-white">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+            ¿Listo para comenzar?
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Frontend desarrollado con React, Vite y Tailwind CSS, preparado para conectarse 
-            al backend FastAPI del Sistema de Evaluación de Labor Pontificia.
+          <p className="text-xl text-gray-200 mb-8">
+            Únete a la comunidad educativa pontificia y descubre todas las herramientas 
+            que tenemos para optimizar tu trabajo diario
           </p>
-        </div>
-
-        {/* Status Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                </div>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">React + Vite</p>
-                <p className="text-2xl font-semibold text-gray-900">Activo</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7H9.5a2.5 2.5 0 000 5h1.672a2.5 2.5 0 010 5H9.5a2.5 2.5 0 01-1.5-.67"></path>
-                  </svg>
-                </div>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Tailwind CSS</p>
-                <p className="text-2xl font-semibold text-gray-900">Configurado</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
-                  </svg>
-                </div>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">React Router</p>
-                <p className="text-2xl font-semibold text-gray-900">Instalado</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className={`w-8 h-8 ${error ? 'bg-yellow-100' : 'bg-green-100'} rounded-lg flex items-center justify-center`}>
-                  <svg className={`w-5 h-5 ${error ? 'text-yellow-600' : 'text-green-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                  </svg>
-                </div>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Backend API</p>
-                <p className="text-2xl font-semibold text-gray-900">
-                  {error ? 'Pendiente' : 'Conectado'}
-                </p>
-              </div>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              size="lg"
+              className="bg-accent-400 text-primary-800 hover:bg-accent-300"
+            >
+              Iniciar Sesión
+            </Button>
+            <Button 
+              variant="secondary"
+              size="lg"
+              className="text-white border-white hover:bg-white hover:text-primary-800"
+            >
+              Solicitar Demo
+            </Button>
           </div>
         </div>
-
-        {/* Backend Connection Info */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Información del Sistema
-          </h3>
-          
-          {loading ? (
-            <div className="animate-pulse">
-              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-2/3"></div>
-            </div>
-          ) : systemInfo ? (
-            <div className="space-y-3">
-              <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-gray-600">Nombre de la aplicación:</span>
-                <span className="font-medium text-gray-900">{systemInfo.app_name}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-gray-600">Versión del backend:</span>
-                <span className="font-medium text-gray-900">{systemInfo.version}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-gray-600">Framework:</span>
-                <span className="font-medium text-gray-900">{systemInfo.framework}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-gray-600">Base de datos:</span>
-                <span className="font-medium text-gray-900">{systemInfo.database}</span>
-              </div>
-              <div className="flex justify-between items-center py-2">
-                <span className="text-gray-600">Entorno:</span>
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  systemInfo.environment === 'production' 
-                    ? 'bg-red-100 text-red-800'
-                    : 'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {systemInfo.environment}
-                </span>
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                </svg>
-              </div>
-              <h4 className="text-lg font-medium text-gray-900 mb-2">Backend no disponible</h4>
-              <p className="text-gray-600 mb-4">
-                El backend FastAPI no está ejecutándose. Para conectar completamente el sistema:
-              </p>
-              <div className="text-left max-w-md mx-auto">
-                <ol className="list-decimal list-inside space-y-2 text-sm text-gray-600">
-                  <li>Navega al directorio backendELP</li>
-                  <li>Ejecuta: <code className="bg-gray-100 px-1 rounded">docker-compose up -d</code></li>
-                  <li>O ejecuta: <code className="bg-gray-100 px-1 rounded">uvicorn app.main:app --reload</code></li>
-                </ol>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Next Steps */}
-        <div className="mt-12 bg-gradient-to-r from-primary-50 to-blue-50 rounded-xl p-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Próximos Pasos
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="font-medium text-gray-900 mb-2">Desarrollo Frontend</h4>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Implementar sistema de autenticación</li>
-                <li>• Crear páginas de usuarios y roles</li>
-                <li>• Desarrollar gestión de documentos</li>
-                <li>• Implementar registro de horas</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-medium text-gray-900 mb-2">Integración Backend</h4>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Conectar servicios de API</li>
-                <li>• Implementar manejo de errores</li>
-                <li>• Configurar interceptors</li>
-                <li>• Integrar reportes y dashboards</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
+      </section>
     </div>
   );
 };

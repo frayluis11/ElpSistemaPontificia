@@ -1,0 +1,227 @@
+/* Variables CSS personalizadas para ELP Pontificia */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  /* Colores principales */
+  --color-primary: #1f2937;
+  --color-secondary: #3b82f6;
+  --color-accent: #fbbf24;
+  --color-background: #f3f4f6;
+  --color-text: #111827;
+  
+  /* Tamaños de iconos */
+  --icon-size-sm: 16px;
+  --icon-size-base: 20px;
+  --icon-size-lg: 24px;
+  --icon-size-xl: 32px;
+  
+  /* Tipografía */
+  --font-size-title: 24px;
+  --font-size-subtitle: 18px;
+  --font-size-body: 14px;
+  --font-size-caption: 12px;
+  
+  /* Espaciado */
+  --space-header: 64px;
+  --space-sidebar: 256px;
+  --space-sidebar-collapsed: 64px;
+  --space-footer: 48px;
+  
+  /* Transiciones */
+  --transition-fast: 0.15s ease-in-out;
+  --transition-normal: 0.3s ease-in-out;
+  --transition-slow: 0.5s ease-in-out;
+}
+
+/* Utilidades personalizadas */
+.icon-primary {
+  color: var(--color-secondary);
+  width: var(--icon-size-lg);
+  height: var(--icon-size-lg);
+}
+
+.icon-sidebar {
+  color: var(--color-secondary);
+  width: var(--icon-size-base);
+  height: var(--icon-size-base);
+}
+
+.text-elp-primary {
+  color: var(--color-primary);
+}
+
+.text-elp-secondary {
+  color: var(--color-secondary);
+}
+
+.bg-elp-primary {
+  background-color: var(--color-primary);
+}
+
+.bg-elp-secondary {
+  background-color: var(--color-secondary);
+}
+
+.bg-elp-accent {
+  background-color: var(--color-accent);
+}
+
+/* Componentes base */
+.btn-primary {
+  background-color: #3b82f6;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease-in-out;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #2563eb;
+}
+
+.btn-primary:active {
+  background-color: #1d4ed8;
+}
+
+.btn-secondary {
+  background-color: white;
+  color: #3b82f6;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  border: 1px solid #3b82f6;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background-color: #eff6ff;
+}
+
+.card-base {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+}
+
+.input-base {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-base:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Layout específico */
+.layout-header {
+  height: var(--space-header);
+  background-color: white;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.layout-sidebar {
+  width: var(--space-sidebar);
+  background-color: white;
+  border-right: 1px solid #e5e7eb;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease-in-out;
+}
+
+.layout-sidebar-collapsed {
+  width: var(--space-sidebar-collapsed);
+}
+
+.layout-footer {
+  height: var(--space-footer);
+  background-color: #1f2937;
+  color: white;
+}
+
+.layout-main {
+  background-color: #f3f4f6;
+  min-height: 100vh;
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  .layout-sidebar {
+    width: 100%;
+    transform: translateX(-100%);
+  }
+  
+  .layout-sidebar.open {
+    transform: translateX(0);
+  }
+}
+
+/* Animaciones personalizadas */
+.fade-in {
+  animation: fadeIn var(--transition-normal) ease-in-out;
+}
+
+.slide-in-left {
+  animation: slideInLeft var(--transition-normal) ease-out;
+}
+
+.slide-in-right {
+  animation: slideInRight var(--transition-normal) ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+/* Estados de hover para iconos */
+.icon-hover {
+  transition: color 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.icon-hover:hover {
+  color: #2563eb;
+}
+
+/* Scrollbar personalizado */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
