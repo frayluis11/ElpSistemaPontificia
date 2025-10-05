@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from app.core.database import get_db, engine, create_tables
-from app.routers import user_router, role_router, document_router, hours_router, auth, dashboard, file_manager, reports_stats, dashboard_stats, system_monitor
+from app.routers import user_router, role_router, document_router, hours_router, auth, dashboard, file_manager, reports_stats, dashboard_stats, system_monitor, health
 from dotenv import load_dotenv
 import os
 
@@ -22,6 +22,7 @@ async def startup_event():
     create_tables()
 
 # Incluir routers
+app.include_router(health.router)  # Health check (Docker)
 app.include_router(auth.router)  # Autenticación (no requiere auth)
 app.include_router(dashboard.router)  # Dashboards (requiere auth)
 app.include_router(user_router.router)  # CRUD usuarios
