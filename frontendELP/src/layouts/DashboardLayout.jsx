@@ -37,25 +37,25 @@ const DashboardLayout = () => {
     const roleSpecificItems = {
       [ROLES.ADMIN]: [
         { name: 'Usuarios', href: '/admin/users', icon: UsersIcon },
-        { name: 'Documentos', href: '/admin/documents', icon: DocumentTextIcon },
+        { name: 'Documentos', href: '/admin/documentos', icon: DocumentTextIcon },
         { name: 'Horas', href: '/admin/hours', icon: ClockIcon },
         { name: 'Reportes', href: '/admin/reports', icon: ChartBarIcon },
         { name: 'Configuración', href: '/admin/settings', icon: CogIcon },
       ],
       [ROLES.DOCENTE]: [
-        { name: 'Mis Documentos', href: '/docente/documents', icon: DocumentTextIcon },
+        { name: 'Mis Documentos', href: '/docente/documentos', icon: DocumentTextIcon },
         { name: 'Registro de Horas', href: '/docente/hours', icon: ClockIcon },
         { name: 'Mis Reportes', href: '/docente/reports', icon: ChartBarIcon },
       ],
       [ROLES.RRHH]: [
         { name: 'Empleados', href: '/rrhh/employees', icon: UsersIcon },
-        { name: 'Documentos RRHH', href: '/rrhh/documents', icon: DocumentTextIcon },
+        { name: 'Documentos RRHH', href: '/rrhh/documentos', icon: DocumentTextIcon },
         { name: 'Horas Laborales', href: '/rrhh/hours', icon: ClockIcon },
         { name: 'Reportes RRHH', href: '/rrhh/reports', icon: ChartBarIcon },
       ],
       [ROLES.CONTABILIDAD]: [
         { name: 'Finanzas', href: '/contabilidad/finances', icon: BanknotesIcon },
-        { name: 'Documentos', href: '/contabilidad/documents', icon: DocumentTextIcon },
+        { name: 'Documentos', href: '/contabilidad/documentos', icon: DocumentTextIcon },
         { name: 'Reportes', href: '/contabilidad/reports', icon: ChartBarIcon },
       ],
       [ROLES.TI]: [

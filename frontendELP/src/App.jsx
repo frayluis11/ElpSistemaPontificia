@@ -15,6 +15,9 @@ import RRHHDashboard from './pages/RRHH/Dashboard';
 import ContabilidadDashboard from './pages/Contabilidad/Dashboard';
 import TIDashboard from './pages/TI/Dashboard';
 
+// Módulos funcionales
+import { DocumentsModule } from './modules/documents';
+
 function App() {
   return (
     <AuthProvider>
@@ -33,6 +36,7 @@ function App() {
               </RoleBasedRoute>
             }>
               <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="documentos" element={<DocumentsModule />} />
               <Route path="" element={<Navigate to="dashboard" replace />} />
             </Route>
 
@@ -43,6 +47,7 @@ function App() {
               </RoleBasedRoute>
             }>
               <Route path="dashboard" element={<DocenteDashboard />} />
+              <Route path="documentos" element={<DocumentsModule />} />
               <Route path="" element={<Navigate to="dashboard" replace />} />
             </Route>
 
@@ -53,6 +58,7 @@ function App() {
               </RoleBasedRoute>
             }>
               <Route path="dashboard" element={<RRHHDashboard />} />
+              <Route path="documentos" element={<DocumentsModule />} />
               <Route path="" element={<Navigate to="dashboard" replace />} />
             </Route>
 
@@ -63,6 +69,7 @@ function App() {
               </RoleBasedRoute>
             }>
               <Route path="dashboard" element={<ContabilidadDashboard />} />
+              <Route path="documentos" element={<DocumentsModule />} />
               <Route path="" element={<Navigate to="dashboard" replace />} />
             </Route>
 
@@ -73,6 +80,7 @@ function App() {
               </RoleBasedRoute>
             }>
               <Route path="dashboard" element={<TIDashboard />} />
+              <Route path="documentos" element={<DocumentsModule />} />
               <Route path="" element={<Navigate to="dashboard" replace />} />
             </Route>
 
