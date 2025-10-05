@@ -4,6 +4,10 @@ import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute, { RoleBasedRoute } from './components/ProtectedRoute';
 import DashboardLayout from './layouts/DashboardLayout';
 
+// Toastify para notificaciones
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 // Páginas públicas
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -84,9 +88,23 @@ function App() {
               <Route path="" element={<Navigate to="dashboard" replace />} />
             </Route>
 
-            {/* Ruta catch-all - redirigir a home */}
+            {/* Ruta por defecto */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+          
+          {/* Toast Container para notificaciones globales */}
+          <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+          />
         </div>
       </Router>
     </AuthProvider>

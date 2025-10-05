@@ -7,7 +7,9 @@ import {
   TagIcon,
   ExclamationCircleIcon,
   CheckCircleIcon,
-  ClockIcon
+  ClockIcon,
+  PencilSquareIcon,
+  ClipboardDocumentCheckIcon
 } from '@heroicons/react/24/outline';
 import { documentsService } from './documentsService';
 
@@ -39,7 +41,11 @@ const DocumentList = ({ documents, loading, onDocumentSelect, onRefresh, canMana
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status, isSigned = false) => {
+    if (isSigned) {
+      return 'text-emerald-600 bg-emerald-100';
+    }
+    
     switch (status) {
       case 'approved':
         return 'text-green-600 bg-green-100';
@@ -49,12 +55,20 @@ const DocumentList = ({ documents, loading, onDocumentSelect, onRefresh, canMana
         return 'text-red-600 bg-red-100';
       case 'reviewed':
         return 'text-blue-600 bg-blue-100';
+      case 'signed':
+        return 'text-emerald-600 bg-emerald-100';
+      case 'pending_signature':
+        return 'text-purple-600 bg-purple-100';
       default:
         return 'text-gray-600 bg-gray-100';
     }
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = (status, isSigned = false) => {
+    if (isSigned) {
+      return ClipboardDocumentCheckIcon;
+    }
+    
     switch (status) {
       case 'approved':
         return CheckCircleIcon;
@@ -64,12 +78,20 @@ const DocumentList = ({ documents, loading, onDocumentSelect, onRefresh, canMana
         return ExclamationCircleIcon;
       case 'reviewed':
         return EyeIcon;
+      case 'signed':
+        return ClipboardDocumentCheckIcon;
+      case 'pending_signature':
+        return PencilSquareIcon;
       default:
         return DocumentTextIcon;
     }
   };
 
-  const getStatusText = (status) => {
+  const getStatusText = (status, isSigned = false) => {
+    if (isSigned) {
+      return 'Firmado';
+    }
+    
     switch (status) {
       case 'approved':
         return 'Aprobado';
@@ -79,6 +101,10 @@ const DocumentList = ({ documents, loading, onDocumentSelect, onRefresh, canMana
         return 'Rechazado';
       case 'reviewed':
         return 'Revisado';
+      case 'signed':
+        return 'Firmado';
+      case 'pending_signature':
+        return 'Esperando Firma';
       default:
         return 'Sin estado';
     }
@@ -156,13 +182,16 @@ const DocumentList = ({ documents, loading, onDocumentSelect, onRefresh, canMana
       {/* Lista de documentos */}
       <div className="space-y-4">
         {documents.map((document) => {
-          const StatusIcon = getStatusIcon(document.status);
+          const isSigned = document.signed || document.signature_info;
+          const StatusIcon = getStatusIcon(document.status, isSigned);
           
           return (
             <div
               key={document.id}
               onClick={() => onDocumentSelect(document)}
-              className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer bg-white"
+              className={`border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer bg-white ${
+                isSigned ? 'border-emerald-200 bg-emerald-50' : 'border-gray-200'
+              }`}
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-4 flex-1">
@@ -182,6 +211,16 @@ const DocumentList = ({ documents, loading, onDocumentSelect, onRefresh, canMana
                       {!document.read_by_user && (
                         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                           Nuevo
+                        </span>
+                      )}
+                      {isSigned && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                          ✓ Firmado
+                        </span>
+                      )}
+                      {document.status === 'pending_signature' && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                          ✍️ Pendiente de Firma
                         </span>
                       )}
                     </div>
@@ -222,8 +261,8 @@ const DocumentList = ({ documents, loading, onDocumentSelect, onRefresh, canMana
                   {/* Estado */}
                   <div className="flex items-center space-x-1">
                     <StatusIcon className="h-4 w-4" />
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(document.status)}`}>
-                      {getStatusText(document.status)}
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(document.status, isSigned)}`}>
+                      {getStatusText(document.status, isSigned)}
                     </span>
                   </div>
 

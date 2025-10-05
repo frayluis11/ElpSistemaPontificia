@@ -18,6 +18,8 @@ import {
 } from '@heroicons/react/24/outline';
 import { documentsService } from './documentsService';
 import { useAuth } from '../../context/AuthContext';
+import DigitalSign from '../../components/common/DigitalSign';
+import DocumentStatus from '../../components/common/DocumentStatus';
 
 const DocumentDetail = ({ document, onBack, onDocumentUpdate, canManage }) => {
   const { user } = useAuth();
@@ -28,6 +30,9 @@ const DocumentDetail = ({ document, onBack, onDocumentUpdate, canManage }) => {
   const [documentStatus, setDocumentStatus] = useState(document?.status || 'pending');
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showSignModal, setShowSignModal] = useState(false);
+  const [isSigned, setIsSigned] = useState(document?.signed || false);
+  const [signatureInfo, setSignatureInfo] = useState(document?.signature_info || null);
 
   useEffect(() => {
     if (document?.id) {
@@ -143,6 +148,20 @@ const DocumentDetail = ({ document, onBack, onDocumentUpdate, canManage }) => {
       setLoading(false);
       setShowDeleteConfirm(false);
     }
+  };
+
+  const handleSignSuccess = (signatureData) => {
+    setIsSigned(true);
+    setSignatureInfo(signatureData);
+    setDocumentStatus('signed');
+    setShowSignModal(false);
+    onDocumentUpdate && onDocumentUpdate();
+  };
+
+  const canSign = () => {
+    // Solo docentes y usuarios autorizados pueden firmar
+    const allowedRoles = ['Docente', 'RRHH', 'Administrador'];
+    return user && allowedRoles.includes(user.rol) && !isSigned && documentStatus !== 'rejected';
   };
 
   const getStatusColor = (status) => {
@@ -432,6 +451,30 @@ const DocumentDetail = ({ document, onBack, onDocumentUpdate, canManage }) => {
                 <span>{loading ? 'Descargando...' : 'Descargar'}</span>
               </button>
               
+              {canSign() && (
+                <button
+                  onClick={() => setShowSignModal(true)}
+                  className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  <PencilIcon className="h-4 w-4" />
+                  <span>Firmar Documento</span>
+                </button>
+              )}
+              
+              {isSigned && (
+                <div className="w-full p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex items-center space-x-2 text-green-800">
+                    <CheckCircleIcon className="h-5 w-5" />
+                    <span className="text-sm font-medium">Documento Firmado</span>
+                  </div>
+                  {signatureInfo && (
+                    <p className="text-xs text-green-600 mt-1">
+                      Firmado el {new Date(signatureInfo.signedAt).toLocaleDateString('es-ES')}
+                    </p>
+                  )}
+                </div>
+              )}
+              
               {canManage && (
                 <>
                   <button
@@ -476,6 +519,15 @@ const DocumentDetail = ({ document, onBack, onDocumentUpdate, canManage }) => {
               </div>
             </div>
           )}
+
+          {/* Estado del documento */}
+          <div className="bg-white rounded-lg border border-gray-200">
+            <DocumentStatus 
+              documentId={document.id}
+              currentStatus={documentStatus}
+              onStatusUpdate={handleDocumentUpdate}
+            />
+          </div>
 
           {/* Información adicional */}
           <div className="bg-white rounded-lg border border-gray-200 p-6">
@@ -547,6 +599,15 @@ const DocumentDetail = ({ document, onBack, onDocumentUpdate, canManage }) => {
           </div>
         </div>
       )}
+
+      {/* Modal de firma digital */}
+      <DigitalSign
+        documentId={document.id}
+        documentTitle={document.title || document.filename}
+        isOpen={showSignModal}
+        onSignSuccess={handleSignSuccess}
+        onCancel={() => setShowSignModal(false)}
+      />
     </div>
   );
 };

@@ -176,4 +176,6 @@ export const fileUtils = {
   },
 };
 
+// Exportaciones
+export { api };
 export default api;

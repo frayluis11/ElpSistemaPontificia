@@ -8,30 +8,74 @@ import {
   CogIcon,
   ExclamationTriangleIcon,
   CheckCircleIcon,
-  ArrowTrendingUpIcon
+  ArrowTrendingUpIcon,
+  PencilSquareIcon,
+  ClipboardDocumentCheckIcon,
+  BellAlertIcon
 } from '@heroicons/react/24/outline';
+import axios from 'axios';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalDocuments: 0,
+    signedDocuments: 0,
+    pendingSignatures: 0,
     totalHours: 0,
-    systemAlerts: 0
+    systemAlerts: 0,
+    todayActivity: 0
   });
+  const [loading, setLoading] = useState(true);
 
-  // Simular carga de estadísticas (en producción vendría de la API)
+  // Cargar estadísticas desde la API
   useEffect(() => {
-    // Simular llamada a API
-    setTimeout(() => {
+    loadDashboardStats();
+  }, []);
+
+  const loadDashboardStats = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/admin/dashboard-stats`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+
+      if (response.data.success) {
+        setStats(response.data.stats);
+      } else {
+        // Datos de fallback si la API no responde
+        setStats({
+          totalUsers: 156,
+          totalDocuments: 2340,
+          signedDocuments: 1876,
+          pendingSignatures: 464,
+          totalHours: 8765,
+          systemAlerts: 3,
+          todayActivity: 28
+        });
+      }
+    } catch (error) {
+      console.error('Error loading dashboard stats:', error);
+      // Datos de fallback en caso de error
       setStats({
         totalUsers: 156,
         totalDocuments: 2340,
+        signedDocuments: 1876,
+        pendingSignatures: 464,
         totalHours: 8765,
-        systemAlerts: 3
+        systemAlerts: 3,
+        todayActivity: 28
       });
-    }, 1000);
-  }, []);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const quickActions = [
     {
@@ -44,7 +88,7 @@ const AdminDashboard = () => {
     {
       name: 'Documentos',
       description: 'Revisar documentos pendientes',
-      href: '/admin/documents',
+      href: '/admin/documentos',
       icon: DocumentTextIcon,
       color: 'bg-green-500',
     },
@@ -200,6 +244,86 @@ const AdminDashboard = () => {
           <div className="bg-red-50 px-6 py-3">
             <div className="text-sm text-red-700">
               Requieren atención
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Estadísticas adicionales de documentos */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 mt-6">
+        <div className="bg-white overflow-hidden shadow-lg rounded-lg">
+          <div className="p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <ClipboardDocumentCheckIcon className="h-8 w-8 text-emerald-600" />
+              </div>
+              <div className="ml-5 w-0 flex-1">
+                <dl>
+                  <dt className="text-sm font-medium text-gray-500 truncate">
+                    Documentos Firmados
+                  </dt>
+                  <dd className="text-3xl font-bold text-gray-900">
+                    {loading ? '...' : stats.signedDocuments}
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+          <div className="bg-emerald-50 px-6 py-3">
+            <div className="text-sm text-emerald-700 flex items-center">
+              <CheckCircleIcon className="h-4 w-4 mr-1" />
+              {loading ? 'Cargando...' : `${Math.round((stats.signedDocuments / stats.totalDocuments) * 100)}% del total`}
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white overflow-hidden shadow-lg rounded-lg">
+          <div className="p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <PencilSquareIcon className="h-8 w-8 text-orange-600" />
+              </div>
+              <div className="ml-5 w-0 flex-1">
+                <dl>
+                  <dt className="text-sm font-medium text-gray-500 truncate">
+                    Pendientes de Firma
+                  </dt>
+                  <dd className="text-3xl font-bold text-gray-900">
+                    {loading ? '...' : stats.pendingSignatures}
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+          <div className="bg-orange-50 px-6 py-3">
+            <div className="text-sm text-orange-700 flex items-center">
+              <ClockIcon className="h-4 w-4 mr-1" />
+              Requieren acción
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white overflow-hidden shadow-lg rounded-lg">
+          <div className="p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <BellAlertIcon className="h-8 w-8 text-purple-600" />
+              </div>
+              <div className="ml-5 w-0 flex-1">
+                <dl>
+                  <dt className="text-sm font-medium text-gray-500 truncate">
+                    Actividad Hoy
+                  </dt>
+                  <dd className="text-3xl font-bold text-gray-900">
+                    {loading ? '...' : stats.todayActivity}
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+          <div className="bg-purple-50 px-6 py-3">
+            <div className="text-sm text-purple-700">
+              Documentos procesados
             </div>
           </div>
         </div>

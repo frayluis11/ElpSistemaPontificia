@@ -16,6 +16,7 @@ import {
   BanknotesIcon,
   ComputerDesktopIcon
 } from '@heroicons/react/24/outline';
+import Notifications from '../components/common/Notifications';
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -143,7 +144,10 @@ const DashboardLayout = () => {
                 Sistema ELP Pontificia
               </h1>
             </div>
-            <div className="ml-4 flex items-center md:ml-6">
+            <div className="ml-4 flex items-center md:ml-6 space-x-4">
+              {/* Notificaciones */}
+              <Notifications />
+              
               <div className="flex items-center">
                 <span className="text-sm text-gray-700 mr-4">
                   {user?.nombre_completo || user?.email}
