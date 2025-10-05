@@ -12,11 +12,13 @@ import {
   PencilSquareIcon,
   ClipboardDocumentCheckIcon,
   BellAlertIcon,
-  ArrowDownTrayIcon
+  ArrowDownTrayIcon,
+  MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
 import axios from 'axios';
 import InteractiveCharts from '../../components/common/InteractiveCharts';
 import ExportReports from '../../components/common/ExportReports';
+import SearchableDataView from '../../components/common/SearchableDataView';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
@@ -32,6 +34,7 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [showExportModal, setShowExportModal] = useState(false);
   const [dashboardData, setDashboardData] = useState(null);
+  const [activeTab, setActiveTab] = useState('overview');
 
   // Cargar estadísticas desde la API
   useEffect(() => {
@@ -445,6 +448,116 @@ const AdminDashboard = () => {
           />
         </div>
       )}
+
+      {/* Pestañas de navegación - Panel Administrativo */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="border-b border-gray-200">
+          <nav className="-mb-px flex space-x-8 px-6" aria-label="Tabs">
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'overview'
+                  ? 'border-red-500 text-red-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <ChartBarIcon className="w-5 h-5 inline mr-2" />
+              Panel General
+            </button>
+            <button
+              onClick={() => setActiveTab('documents')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'documents'
+                  ? 'border-red-500 text-red-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <DocumentTextIcon className="w-5 h-5 inline mr-2" />
+              Todos los Documentos
+            </button>
+            <button
+              onClick={() => setActiveTab('reports')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'reports'
+                  ? 'border-red-500 text-red-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <ClipboardDocumentCheckIcon className="w-5 h-5 inline mr-2" />
+              Reportes Consolidados
+            </button>
+            <button
+              onClick={() => setActiveTab('search')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'search'
+                  ? 'border-red-500 text-red-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <MagnifyingGlassIcon className="w-5 h-5 inline mr-2" />
+              Búsqueda Completa
+            </button>
+          </nav>
+        </div>
+
+        {/* Contenido de las pestañas */}
+        <div className="p-6">
+          {activeTab === 'overview' && (
+            <div className="space-y-6">
+              <h3 className="text-lg font-semibold text-gray-900">Actividad Reciente del Sistema</h3>
+              <p className="text-gray-600">Resumen de la actividad global del sistema y documentos pendientes de atención.</p>
+              
+              {/* Aquí mantendríamos la actividad reciente original */}
+              <div className="space-y-3">
+                {recentActivity.map((activity) => (
+                  <div key={activity.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <div className="h-8 w-8 bg-gray-200 rounded-full flex items-center justify-center">
+                        <span className="text-xs font-medium text-gray-600">
+                          {activity.user.charAt(0)}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">{activity.action}</p>
+                        <p className="text-xs text-gray-500">por {activity.user} • {activity.time}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'documents' && (
+            <SearchableDataView
+              dataType="documents"
+              title="Gestión de Documentos - Vista Administrativa"
+              onView={(item) => console.log('Ver documento:', item)}
+              onEdit={(item) => console.log('Editar documento:', item)}
+              onDelete={(item) => console.log('Eliminar documento:', item)}
+            />
+          )}
+
+          {activeTab === 'reports' && (
+            <SearchableDataView
+              dataType="reports"
+              title="Reportes Consolidados del Sistema"
+              onView={(item) => console.log('Ver reporte:', item)}
+              showActions={false}
+            />
+          )}
+
+          {activeTab === 'search' && (
+            <SearchableDataView
+              dataType="documents"
+              title="Búsqueda Avanzada - Acceso Completo de Administrador"
+              onView={(item) => console.log('Ver elemento:', item)}
+              onEdit={(item) => console.log('Editar elemento:', item)}
+              onDelete={(item) => console.log('Eliminar elemento:', item)}
+            />
+          )}
+        </div>
+      </div>
 
       {/* Actividad reciente */}
       <div className="bg-white shadow-lg rounded-lg p-6">
