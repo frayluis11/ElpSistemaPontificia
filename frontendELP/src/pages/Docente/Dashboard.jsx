@@ -6,8 +6,11 @@ import {
   ChartBarIcon,
   BookOpenIcon,
   CalendarDaysIcon,
-  PresentationChartLineIcon
+  PresentationChartLineIcon,
+  ArrowDownTrayIcon
 } from '@heroicons/react/24/outline';
+import InteractiveCharts from '../../components/common/InteractiveCharts';
+import ExportReports from '../../components/common/ExportReports';
 
 const DocenteDashboard = () => {
   const { user } = useAuth();
@@ -17,6 +20,8 @@ const DocenteDashboard = () => {
     studentsAssigned: 0,
     completedTasks: 0
   });
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [dashboardData, setDashboardData] = useState(null);
 
   useEffect(() => {
     setTimeout(() => {
@@ -25,6 +30,23 @@ const DocenteDashboard = () => {
         hoursThisWeek: 32,
         studentsAssigned: 45,
         completedTasks: 18
+      });
+      // Datos específicos para docente
+      setDashboardData({
+        documentsByType: {
+          completed: [8, 12, 5, 6, 4],
+          pending: [2, 3, 1, 1, 2]
+        },
+        hoursProgress: {
+          planned: [40, 38, 42, 40, 35, 38],
+          executed: [38, 36, 40, 39, 33, 36]
+        },
+        documentsByArea: [35, 25, 20, 15, 5], // Más enfocado en planificación y evaluación
+        totals: {
+          documents: 24,
+          signatures: 20,
+          hours: 245
+        }
       });
     }, 1000);
   }, []);
@@ -95,11 +117,20 @@ const DocenteDashboard = () => {
               Panel Docente - Sistema ELP Pontificia
             </p>
           </div>
-          <div className="text-right">
-            <div className="bg-blue-500 bg-opacity-50 rounded-lg p-3">
-              <CalendarDaysIcon className="h-8 w-8 mb-2" />
-              <p className="text-sm">Hoy</p>
-              <p className="font-bold">{new Date().toLocaleDateString('es-ES')}</p>
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => setShowExportModal(true)}
+              className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
+            >
+              <ArrowDownTrayIcon className="w-5 h-5" />
+              <span>Mis Reportes</span>
+            </button>
+            <div className="text-right">
+              <div className="bg-blue-500 bg-opacity-50 rounded-lg p-3">
+                <CalendarDaysIcon className="h-8 w-8 mb-2" />
+                <p className="text-sm">Hoy</p>
+                <p className="font-bold">{new Date().toLocaleDateString('es-ES')}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -256,6 +287,23 @@ const DocenteDashboard = () => {
         </div>
 
         {/* Documentos recientes */}
+        {/* Gráficos para Docente */}
+        {dashboardData && (
+          <div className="col-span-1 lg:col-span-2">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Mi Progreso Académico</h2>
+              <div className="flex items-center space-x-2 text-sm text-gray-500">
+                <ChartBarIcon className="w-4 h-4" />
+                <span>Mis estadísticas personales</span>
+              </div>
+            </div>
+            <InteractiveCharts 
+              dashboardData={dashboardData} 
+              userRole="docente" 
+            />
+          </div>
+        )}
+
         <div className="bg-white shadow-lg rounded-lg p-6">
           <h2 className="text-xl font-bold text-gray-900 mb-6">Documentos Recientes</h2>
           <div className="space-y-4">
@@ -276,6 +324,11 @@ const DocenteDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal de Exportación */}
+      {showExportModal && (
+        <ExportReports onClose={() => setShowExportModal(false)} />
+      )}
     </div>
   );
 };
