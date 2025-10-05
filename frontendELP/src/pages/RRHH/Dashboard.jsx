@@ -7,11 +7,13 @@ import {
   ChartBarIcon,
   BriefcaseIcon,
   ArrowDownTrayIcon,
-  MagnifyingGlassIcon
+  MagnifyingGlassIcon,
+  PencilSquareIcon
 } from '@heroicons/react/24/outline';
 import InteractiveCharts from '../../components/common/InteractiveCharts';
 import ExportReports from '../../components/common/ExportReports';
 import SearchableDataView from '../../components/common/SearchableDataView';
+import DocumentManager from '../../components/common/DocumentManager';
 
 const RRHHDashboard = () => {
   const { user } = useAuth();
@@ -268,6 +270,17 @@ const RRHHDashboard = () => {
               <MagnifyingGlassIcon className="w-5 h-5 inline mr-2" />
               Búsqueda Personal
             </button>
+            <button
+              onClick={() => setActiveTab('signatures')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'signatures'
+                  ? 'border-red-500 text-red-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <PencilSquareIcon className="w-5 h-5 inline mr-2" />
+              Firmas RRHH
+            </button>
           </nav>
         </div>
 
@@ -314,6 +327,10 @@ const RRHHDashboard = () => {
               onView={(item) => console.log('Ver elemento:', item)}
               onEdit={(item) => console.log('Editar elemento:', item)}
             />
+          )}
+
+          {activeTab === 'signatures' && (
+            <DocumentManager />
           )}
         </div>
       </div>

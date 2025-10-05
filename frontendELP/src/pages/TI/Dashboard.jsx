@@ -9,13 +9,17 @@ import {
   ServerIcon,
   ExclamationTriangleIcon,
   CheckCircleIcon,
-  MagnifyingGlassIcon
+  MagnifyingGlassIcon,
+  PencilSquareIcon
 } from '@heroicons/react/24/outline';
 import SearchableDataView from '../../components/common/SearchableDataView';
+import DocumentManager from '../../components/common/DocumentManager';
+import { AuditLogger, AuditLogViewer } from '../../components/common/AuditLogger';
 
 const TIDashboard = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
+  const auditLogger = AuditLogger();
   const [stats, setStats] = useState({
     systemUptime: 0,
     activeUsers: 0,
@@ -278,6 +282,28 @@ const TIDashboard = () => {
               <MagnifyingGlassIcon className="w-5 h-5 inline mr-2" />
               Auditoría de Acceso
             </button>
+            <button
+              onClick={() => setActiveTab('signatures')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'signatures'
+                  ? 'border-red-500 text-red-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <PencilSquareIcon className="w-5 h-5 inline mr-2" />
+              Firmas del Sistema
+            </button>
+            <button
+              onClick={() => setActiveTab('audit')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'audit'
+                  ? 'border-red-500 text-red-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <ShieldCheckIcon className="w-5 h-5 inline mr-2" />
+              Log Completo
+            </button>
           </nav>
         </div>
 
@@ -331,6 +357,25 @@ const TIDashboard = () => {
               dataType="documents"
               title="Auditoría de Acceso - Historial Completo"
               onView={(item) => console.log('Ver elemento:', item)}
+            />
+          )}
+
+          {activeTab === 'signatures' && (
+            <DocumentManager />
+          )}
+
+          {activeTab === 'audit' && (
+            <AuditLogViewer
+              logs={auditLogger.auditLogs}
+              filters={auditLogger.filters}
+              onFiltersChange={auditLogger.setFilters}
+              uniqueUsers={auditLogger.uniqueUsers}
+              utilities={{
+                getActionIcon: auditLogger.getActionIcon,
+                getActionColor: auditLogger.getActionColor,
+                getActionLabel: auditLogger.getActionLabel,
+                getRoleColor: auditLogger.getRoleColor
+              }}
             />
           )}
         </div>

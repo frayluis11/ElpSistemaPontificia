@@ -7,9 +7,11 @@ import {
   CalculatorIcon,
   CurrencyDollarIcon,
   CreditCardIcon,
-  MagnifyingGlassIcon
+  MagnifyingGlassIcon,
+  PencilSquareIcon
 } from '@heroicons/react/24/outline';
 import SearchableDataView from '../../components/common/SearchableDataView';
+import DocumentManager from '../../components/common/DocumentManager';
 
 const ContabilidadDashboard = () => {
   const { user } = useAuth();
@@ -246,6 +248,17 @@ const ContabilidadDashboard = () => {
               <MagnifyingGlassIcon className="w-5 h-5 inline mr-2" />
               Búsqueda Financiera
             </button>
+            <button
+              onClick={() => setActiveTab('signatures')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'signatures'
+                  ? 'border-red-500 text-red-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <PencilSquareIcon className="w-5 h-5 inline mr-2" />
+              Firmas Contables
+            </button>
           </nav>
         </div>
 
@@ -283,6 +296,10 @@ const ContabilidadDashboard = () => {
               onView={(item) => console.log('Ver elemento:', item)}
               onEdit={(item) => console.log('Editar elemento:', item)}
             />
+          )}
+
+          {activeTab === 'signatures' && (
+            <DocumentManager />
           )}
         </div>
       </div>
