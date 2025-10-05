@@ -14,11 +14,17 @@ DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASSWORD = os.getenv("DB_PASSWORD", os.getenv("DB_PASS", "postgres"))  # Compatibilidad con ambos nombres
 DB_NAME = os.getenv("DB_NAME", "sistemaelp_db")
 
-# URL de conexión a PostgreSQL
-DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-
-# Crear engine de SQLAlchemy
-engine = create_engine(DATABASE_URL)
+# URL de conexión - usar SQLite para desarrollo si PostgreSQL no está disponible
+try:
+    DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    engine = create_engine(DATABASE_URL)
+    # Probar conexión
+    engine.connect()
+    print("✅ Conectado a PostgreSQL")
+except:
+    print("⚠️ PostgreSQL no disponible, usando SQLite para desarrollo")
+    DATABASE_URL = "sqlite:///./test.db"
+    engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 
 # Crear SessionLocal para las sesiones de base de datos
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
