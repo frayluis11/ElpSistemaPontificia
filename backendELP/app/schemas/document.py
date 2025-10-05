@@ -8,7 +8,7 @@ class DocumentBase(BaseModel):
     tipo_documento: str = Field(..., min_length=2, max_length=50)
     ruta_archivo: Optional[str] = Field(None, max_length=500)
     usuario_id: int
-    estado: Optional[str] = Field("pendiente", regex="^(pendiente|aprobado|rechazado)$")
+    estado: Optional[str] = Field("pendiente", pattern="^(pendiente|aprobado|rechazado)$")
     observaciones: Optional[str] = None
 
 class DocumentCreate(DocumentBase):
@@ -18,7 +18,7 @@ class DocumentUpdate(BaseModel):
     titulo: Optional[str] = Field(None, min_length=2, max_length=200)
     tipo_documento: Optional[str] = Field(None, min_length=2, max_length=50)
     ruta_archivo: Optional[str] = Field(None, max_length=500)
-    estado: Optional[str] = Field(None, regex="^(pendiente|aprobado|rechazado)$")
+    estado: Optional[str] = Field(None, pattern="^(pendiente|aprobado|rechazado)$")
     observaciones: Optional[str] = None
 
 class DocumentResponse(DocumentBase):

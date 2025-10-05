@@ -6,7 +6,7 @@ from typing import Optional, List
 class UserBase(BaseModel):
     nombre: str = Field(..., min_length=2, max_length=50)
     apellido: str = Field(..., min_length=2, max_length=50)
-    dni: str = Field(..., min_length=8, max_length=8, regex="^[0-9]{8}$")
+    dni: str = Field(..., min_length=8, max_length=8, pattern="^[0-9]{8}$")
     correo_institucional: EmailStr
     rol_id: int
 
