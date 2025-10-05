@@ -1,0 +1,212 @@
+name: CI/CD Pipeline - Sistema ELP Pontificia
+
+on:
+  push:
+    branches: [ main, develop, testing-ci-docs ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: elp_pontificia_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://postgres:test_password@localhost:5432/elp_pontificia_test
+      SECRET_KEY: test_secret_key_for_ci_cd_testing_only
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      UPLOAD_DIR: ./test_uploads
+      MAX_FILE_SIZE_MB: 10
+
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+
+    - name: Configurar Python 3.13
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.13'
+        cache: 'pip'
+
+    - name: Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Crear directorio de uploads para tests
+      run: mkdir -p ./test_uploads
+
+    - name: Ejecutar tests con pytest
+      run: |
+        pytest tests/ -v --tb=short --cov=app --cov-report=term-missing
+      env:
+        PYTHONPATH: .
+
+    - name: Verificar estructura del proyecto
+      run: |
+        echo "=== Estructura del proyecto ==="
+        find . -name "*.py" -type f | head -20
+        echo "=== Archivos de configuración ==="
+        ls -la *.yml *.yaml *.json *.txt 2>/dev/null || echo "No se encontraron archivos de configuración"
+
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+
+    - name: Configurar Python 3.13
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.13'
+        cache: 'pip'
+
+    - name: Instalar dependencias de linting
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 black isort mypy
+        pip install -r requirements.txt
+
+    - name: Ejecutar flake8 (Linting)
+      run: |
+        flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 app/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    - name: Verificar formato con black
+      run: |
+        black --check app/ tests/
+
+    - name: Verificar imports con isort
+      run: |
+        isort --check-only app/ tests/
+
+    - name: Análisis de tipos con mypy (opcional)
+      run: |
+        mypy app/ --ignore-missing-imports --no-strict-optional || echo "Mypy encontró algunos problemas (no críticos)"
+
+  security:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+
+    - name: Configurar Python 3.13
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.13'
+        cache: 'pip'
+
+    - name: Instalar dependencias de seguridad
+      run: |
+        python -m pip install --upgrade pip
+        pip install safety bandit
+        pip install -r requirements.txt
+
+    - name: Verificar vulnerabilidades en dependencias
+      run: |
+        safety check --json || safety check
+
+    - name: Análisis de seguridad con bandit
+      run: |
+        bandit -r app/ -f json || bandit -r app/
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: [test, lint]
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+
+    - name: Configurar Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Construir imagen Docker
+      run: |
+        docker build -t elp-pontificia-backend:latest .
+
+    - name: Verificar imagen Docker
+      run: |
+        docker images | grep elp-pontificia-backend
+        echo "=== Imagen Docker construida exitosamente ==="
+
+    - name: Test básico de la imagen
+      run: |
+        docker run --rm --name test-container -d -p 8000:8000 \
+          -e DATABASE_URL=sqlite:///./test.db \
+          -e SECRET_KEY=test_key \
+          elp-pontificia-backend:latest
+        sleep 10
+        curl -f http://localhost:8000/ || curl -f http://localhost:8000/docs
+        docker stop test-container
+
+  integration:
+    runs-on: ubuntu-latest
+    needs: [test]
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+
+    - name: Configurar Python 3.13
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.13'
+
+    - name: Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Ejecutar Docker Compose para tests de integración
+      run: |
+        cp .env.example .env
+        echo "DATABASE_URL=postgresql://postgres:test_password@db:5432/elp_pontificia" >> .env
+        echo "SECRET_KEY=test_secret_key_integration" >> .env
+        docker-compose -f docker-compose.yml up -d --build
+        sleep 30
+        
+    - name: Verificar servicios en Docker Compose
+      run: |
+        docker-compose ps
+        docker-compose logs backend
+        curl -f http://localhost:8000/ || curl -f http://localhost:8000/docs
+        
+    - name: Limpiar Docker Compose
+      run: |
+        docker-compose down -v
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: [test, lint, security]
+    if: always()
+    
+    steps:
+    - name: Notificar resultado
+      run: |
+        if [[ "${{ needs.test.result }}" == "success" && "${{ needs.lint.result }}" == "success" && "${{ needs.security.result }}" == "success" ]]; then
+          echo "✅ Todos los tests pasaron exitosamente"
+        else
+          echo "❌ Algunos tests fallaron"
+          echo "Test result: ${{ needs.test.result }}"
+          echo "Lint result: ${{ needs.lint.result }}"
+          echo "Security result: ${{ needs.security.result }}"
+        fi

@@ -11,11 +11,11 @@ load_dotenv()
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = os.getenv("DB_PORT", "5432")
 DB_USER = os.getenv("DB_USER", "postgres")
-DB_PASS = os.getenv("DB_PASS", "postgres")
+DB_PASSWORD = os.getenv("DB_PASSWORD", os.getenv("DB_PASS", "postgres"))  # Compatibilidad con ambos nombres
 DB_NAME = os.getenv("DB_NAME", "sistemaelp_db")
 
 # URL de conexión a PostgreSQL
-DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 # Crear engine de SQLAlchemy
 engine = create_engine(DATABASE_URL)
@@ -25,6 +25,16 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Base para los modelos
 Base = declarative_base()
+
+# Importar modelos para que se registren con Base
+from app.models.user import User
+from app.models.role import Role
+from app.models.document import Document
+from app.models.hours import Hours
+
+# Crear todas las tablas
+def create_tables():
+    Base.metadata.create_all(bind=engine)
 
 # Dependency para obtener la sesión de base de datos
 def get_db():
