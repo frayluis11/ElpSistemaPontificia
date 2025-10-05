@@ -1,0 +1,272 @@
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import {
+  UsersIcon,
+  DocumentTextIcon,
+  ClockIcon,
+  ChartBarIcon,
+  CogIcon,
+  ExclamationTriangleIcon,
+  CheckCircleIcon,
+  ArrowTrendingUpIcon
+} from '@heroicons/react/24/outline';
+
+const AdminDashboard = () => {
+  const { user } = useAuth();
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalDocuments: 0,
+    totalHours: 0,
+    systemAlerts: 0
+  });
+
+  // Simular carga de estadísticas (en producción vendría de la API)
+  useEffect(() => {
+    // Simular llamada a API
+    setTimeout(() => {
+      setStats({
+        totalUsers: 156,
+        totalDocuments: 2340,
+        totalHours: 8765,
+        systemAlerts: 3
+      });
+    }, 1000);
+  }, []);
+
+  const quickActions = [
+    {
+      name: 'Gestionar Usuarios',
+      description: 'Administrar cuentas de usuario',
+      href: '/admin/users',
+      icon: UsersIcon,
+      color: 'bg-blue-500',
+    },
+    {
+      name: 'Documentos',
+      description: 'Revisar documentos pendientes',
+      href: '/admin/documents',
+      icon: DocumentTextIcon,
+      color: 'bg-green-500',
+    },
+    {
+      name: 'Control de Horas',
+      description: 'Supervisar registro de horas',
+      href: '/admin/hours',
+      icon: ClockIcon,
+      color: 'bg-yellow-500',
+    },
+    {
+      name: 'Reportes',
+      description: 'Generar reportes del sistema',
+      href: '/admin/reports',
+      icon: ChartBarIcon,
+      color: 'bg-purple-500',
+    },
+    {
+      name: 'Configuración',
+      description: 'Configurar el sistema',
+      href: '/admin/settings',
+      icon: CogIcon,
+      color: 'bg-gray-500',
+    },
+  ];
+
+  const recentActivity = [
+    { id: 1, action: 'Nuevo usuario registrado', user: 'Maria Rodriguez', time: '2 min ago', type: 'user' },
+    { id: 2, action: 'Documento subido', user: 'Carlos Mendez', time: '15 min ago', type: 'document' },
+    { id: 3, action: 'Horas reportadas', user: 'Ana García', time: '1 hour ago', type: 'hours' },
+    { id: 4, action: 'Reporte generado', user: 'Admin System', time: '2 hours ago', type: 'report' },
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-red-600 to-pink-600 rounded-lg shadow-xl p-6 text-white">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">
+              ¡Bienvenido, {user?.nombre_completo || 'Administrador'}!
+            </h1>
+            <p className="text-red-100 text-lg">
+              Panel de Administración - Sistema ELP Pontificia
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="text-red-100 text-sm">Último acceso</p>
+            <p className="text-white font-semibold">
+              {new Date().toLocaleDateString('es-ES')}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Estadísticas principales */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white overflow-hidden shadow-lg rounded-lg">
+          <div className="p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <UsersIcon className="h-8 w-8 text-blue-600" />
+              </div>
+              <div className="ml-5 w-0 flex-1">
+                <dl>
+                  <dt className="text-sm font-medium text-gray-500 truncate">
+                    Total Usuarios
+                  </dt>
+                  <dd className="text-3xl font-bold text-gray-900">
+                    {stats.totalUsers}
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+          <div className="bg-blue-50 px-6 py-3">
+            <div className="text-sm text-blue-700 flex items-center">
+              <ArrowTrendingUpIcon className="h-4 w-4 mr-1" />
+              +12% este mes
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white overflow-hidden shadow-lg rounded-lg">
+          <div className="p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <DocumentTextIcon className="h-8 w-8 text-green-600" />
+              </div>
+              <div className="ml-5 w-0 flex-1">
+                <dl>
+                  <dt className="text-sm font-medium text-gray-500 truncate">
+                    Documentos
+                  </dt>
+                  <dd className="text-3xl font-bold text-gray-900">
+                    {stats.totalDocuments}
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+          <div className="bg-green-50 px-6 py-3">
+            <div className="text-sm text-green-700 flex items-center">
+              <CheckCircleIcon className="h-4 w-4 mr-1" />
+              85% procesados
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white overflow-hidden shadow-lg rounded-lg">
+          <div className="p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <ClockIcon className="h-8 w-8 text-yellow-600" />
+              </div>
+              <div className="ml-5 w-0 flex-1">
+                <dl>
+                  <dt className="text-sm font-medium text-gray-500 truncate">
+                    Horas Registradas
+                  </dt>
+                  <dd className="text-3xl font-bold text-gray-900">
+                    {stats.totalHours}
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+          <div className="bg-yellow-50 px-6 py-3">
+            <div className="text-sm text-yellow-700">
+              Esta semana: 245h
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white overflow-hidden shadow-lg rounded-lg">
+          <div className="p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <ExclamationTriangleIcon className="h-8 w-8 text-red-600" />
+              </div>
+              <div className="ml-5 w-0 flex-1">
+                <dl>
+                  <dt className="text-sm font-medium text-gray-500 truncate">
+                    Alertas del Sistema
+                  </dt>
+                  <dd className="text-3xl font-bold text-gray-900">
+                    {stats.systemAlerts}
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+          <div className="bg-red-50 px-6 py-3">
+            <div className="text-sm text-red-700">
+              Requieren atención
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Acciones rápidas */}
+      <div className="bg-white shadow-lg rounded-lg p-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Acciones Rápidas</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {quickActions.map((action) => (
+            <a
+              key={action.name}
+              href={action.href}
+              className="group relative bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-red-500 border border-gray-200 rounded-lg hover:shadow-md transition-shadow duration-200"
+            >
+              <div>
+                <span className={`${action.color} rounded-lg inline-flex p-3 text-white ring-4 ring-white`}>
+                  <action.icon className="h-6 w-6" />
+                </span>
+              </div>
+              <div className="mt-4">
+                <h3 className="text-lg font-medium text-gray-900 group-hover:text-red-600">
+                  {action.name}
+                </h3>
+                <p className="mt-2 text-sm text-gray-500">
+                  {action.description}
+                </p>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      {/* Actividad reciente */}
+      <div className="bg-white shadow-lg rounded-lg p-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Actividad Reciente</h2>
+        <div className="flow-root">
+          <ul className="-my-5 divide-y divide-gray-200">
+            {recentActivity.map((activity) => (
+              <li key={activity.id} className="py-4">
+                <div className="flex items-center space-x-4">
+                  <div className="flex-shrink-0">
+                    <div className="h-8 w-8 bg-gray-200 rounded-full flex items-center justify-center">
+                      <span className="text-xs font-medium text-gray-600">
+                        {activity.user.charAt(0)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900">
+                      {activity.action}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      por {activity.user}
+                    </p>
+                  </div>
+                  <div className="flex-shrink-0 text-sm text-gray-500">
+                    {activity.time}
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AdminDashboard;

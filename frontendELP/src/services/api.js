@@ -15,7 +15,7 @@ const api = axios.create({
 // Interceptor para requests - agregar token de autenticación
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('authToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -34,13 +34,31 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Token expirado o no válido
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('user_data');
+      localStorage.removeItem('authToken');
       window.location.href = '/login';
     }
     return Promise.reject(error);
   }
 );
+
+// Función específica para login de usuarios
+export const loginUser = async (credentials) => {
+  try {
+    const response = await api.post('/auth/login', credentials);
+    return {
+      success: true,
+      data: response.data,
+      token: response.data.access_token,
+      user: response.data.user
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data?.detail || 'Error de autenticación',
+      status: error.response?.status
+    };
+  }
+};
 
 // Servicios de autenticación
 export const authAPI = {
