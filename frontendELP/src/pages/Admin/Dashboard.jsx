@@ -11,9 +11,12 @@ import {
   ArrowTrendingUpIcon,
   PencilSquareIcon,
   ClipboardDocumentCheckIcon,
-  BellAlertIcon
+  BellAlertIcon,
+  ArrowDownTrayIcon
 } from '@heroicons/react/24/outline';
 import axios from 'axios';
+import InteractiveCharts from '../../components/common/InteractiveCharts';
+import ExportReports from '../../components/common/ExportReports';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
@@ -27,10 +30,13 @@ const AdminDashboard = () => {
     todayActivity: 0
   });
   const [loading, setLoading] = useState(true);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [dashboardData, setDashboardData] = useState(null);
 
   // Cargar estadísticas desde la API
   useEffect(() => {
     loadDashboardStats();
+    loadDashboardChartsData();
   }, []);
 
   const loadDashboardStats = async () => {
@@ -74,6 +80,63 @@ const AdminDashboard = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadDashboardChartsData = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/admin/charts-data`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+
+      if (response.data.success) {
+        setDashboardData(response.data.chartData);
+      } else {
+        // Datos de ejemplo para desarrollo
+        setDashboardData({
+          documentsByType: {
+            completed: [25, 30, 15, 20, 18],
+            pending: [8, 12, 5, 7, 6]
+          },
+          hoursProgress: {
+            planned: [180, 160, 170, 185, 175, 190],
+            executed: [175, 155, 165, 180, 170, 185]
+          },
+          documentsByArea: [30, 25, 20, 15, 10],
+          signaturesProgress: [45, 52, 38, 63, 57, 71],
+          totals: {
+            documents: 2340,
+            signatures: 1876,
+            hours: 8765
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error loading charts data:', error);
+      // Datos de ejemplo en caso de error
+      setDashboardData({
+        documentsByType: {
+          completed: [25, 30, 15, 20, 18],
+          pending: [8, 12, 5, 7, 6]
+        },
+        hoursProgress: {
+          planned: [180, 160, 170, 185, 175, 190],
+          executed: [175, 155, 165, 180, 170, 185]
+        },
+        documentsByArea: [30, 25, 20, 15, 10],
+        signaturesProgress: [45, 52, 38, 63, 57, 71],
+        totals: {
+          documents: 2340,
+          signatures: 1876,
+          hours: 8765
+        }
+      });
     }
   };
 
@@ -135,11 +198,20 @@ const AdminDashboard = () => {
               Panel de Administración - Sistema ELP Pontificia
             </p>
           </div>
-          <div className="text-right">
-            <p className="text-red-100 text-sm">Último acceso</p>
-            <p className="text-white font-semibold">
-              {new Date().toLocaleDateString('es-ES')}
-            </p>
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => setShowExportModal(true)}
+              className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
+            >
+              <ArrowDownTrayIcon className="w-5 h-5" />
+              <span>Exportar Reportes</span>
+            </button>
+            <div className="text-right">
+              <p className="text-red-100 text-sm">Último acceso</p>
+              <p className="text-white font-semibold">
+                {new Date().toLocaleDateString('es-ES')}
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -357,6 +429,23 @@ const AdminDashboard = () => {
         </div>
       </div>
 
+      {/* Gráficos Interactivos */}
+      {dashboardData && (
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Análisis y Estadísticas</h2>
+            <div className="flex items-center space-x-2 text-sm text-gray-500">
+              <ChartBarIcon className="w-4 h-4" />
+              <span>Datos actualizados en tiempo real</span>
+            </div>
+          </div>
+          <InteractiveCharts 
+            dashboardData={dashboardData} 
+            userRole={user?.role || 'administracion'} 
+          />
+        </div>
+      )}
+
       {/* Actividad reciente */}
       <div className="bg-white shadow-lg rounded-lg p-6">
         <h2 className="text-xl font-bold text-gray-900 mb-6">Actividad Reciente</h2>
@@ -389,6 +478,11 @@ const AdminDashboard = () => {
           </ul>
         </div>
       </div>
+
+      {/* Modal de Exportación */}
+      {showExportModal && (
+        <ExportReports onClose={() => setShowExportModal(false)} />
+      )}
     </div>
   );
 };

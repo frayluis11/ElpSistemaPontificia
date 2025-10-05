@@ -6,8 +6,10 @@ import {
   ClockIcon,
   ChartBarIcon,
   BriefcaseIcon,
-  CalendarIcon
+  ArrowDownTrayIcon
 } from '@heroicons/react/24/outline';
+import InteractiveCharts from '../../components/common/InteractiveCharts';
+import ExportReports from '../../components/common/ExportReports';
 
 const RRHHDashboard = () => {
   const { user } = useAuth();
@@ -17,6 +19,8 @@ const RRHHDashboard = () => {
     hoursThisMonth: 0,
     pendingRequests: 0
   });
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [dashboardData, setDashboardData] = useState(null);
 
   useEffect(() => {
     setTimeout(() => {
@@ -25,6 +29,24 @@ const RRHHDashboard = () => {
         newHires: 8,
         hoursThisMonth: 5420,
         pendingRequests: 12
+      });
+      // Datos específicos para RRHH
+      setDashboardData({
+        documentsByType: {
+          completed: [30, 25, 20, 18, 15],
+          pending: [8, 5, 4, 3, 2]
+        },
+        hoursProgress: {
+          planned: [5500, 5200, 5400, 5300, 5600, 5400],
+          executed: [5420, 5180, 5350, 5280, 5580, 5350]
+        },
+        documentsByArea: [25, 30, 20, 15, 10], // Más enfocado en recursos humanos
+        signaturesProgress: [65, 72, 58, 83, 77, 91],
+        totals: {
+          documents: 156,
+          signatures: 142,
+          hours: 5420
+        }
       });
     }, 1000);
   }, []);
@@ -73,11 +95,20 @@ const RRHHDashboard = () => {
               Panel de Recursos Humanos - Sistema ELP Pontificia
             </p>
           </div>
-          <div className="text-right">
-            <div className="bg-green-500 bg-opacity-50 rounded-lg p-3">
-              <BriefcaseIcon className="h-8 w-8 mb-2" />
-              <p className="text-sm">Empleados Activos</p>
-              <p className="font-bold">{stats.totalEmployees}</p>
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => setShowExportModal(true)}
+              className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
+            >
+              <ArrowDownTrayIcon className="w-5 h-5" />
+              <span>Exportar Reportes</span>
+            </button>
+            <div className="text-right">
+              <div className="bg-green-500 bg-opacity-50 rounded-lg p-3">
+                <BriefcaseIcon className="h-8 w-8 mb-2" />
+                <p className="text-sm">Empleados Activos</p>
+                <p className="font-bold">{stats.totalEmployees}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -186,6 +217,23 @@ const RRHHDashboard = () => {
         </div>
       </div>
 
+      {/* Gráficos Interactivos para RRHH */}
+      {dashboardData && (
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Análisis de Recursos Humanos</h2>
+            <div className="flex items-center space-x-2 text-sm text-gray-500">
+              <ChartBarIcon className="w-4 h-4" />
+              <span>Datos del personal y gestión</span>
+            </div>
+          </div>
+          <InteractiveCharts 
+            dashboardData={dashboardData} 
+            userRole="rrhh" 
+          />
+        </div>
+      )}
+
       {/* Acciones rápidas */}
       <div className="bg-white shadow-lg rounded-lg p-6">
         <h2 className="text-xl font-bold text-gray-900 mb-6">Acciones Rápidas</h2>
@@ -213,6 +261,11 @@ const RRHHDashboard = () => {
           ))}
         </div>
       </div>
+
+      {/* Modal de Exportación */}
+      {showExportModal && (
+        <ExportReports onClose={() => setShowExportModal(false)} />
+      )}
     </div>
   );
 };
