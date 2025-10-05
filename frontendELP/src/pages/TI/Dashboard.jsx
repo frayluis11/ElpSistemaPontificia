@@ -15,6 +15,7 @@ import {
 import SearchableDataView from '../../components/common/SearchableDataView';
 import DocumentManager from '../../components/common/DocumentManager';
 import { AuditLogger, AuditLogViewer } from '../../components/common/AuditLogger';
+import AdvancedDashboard from '../../components/common/Dashboard';
 
 const TIDashboard = () => {
   const { user } = useAuth();
@@ -304,6 +305,17 @@ const TIDashboard = () => {
               <ShieldCheckIcon className="w-5 h-5 inline mr-2" />
               Log Completo
             </button>
+            <button
+              onClick={() => setActiveTab('advanced-stats')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'advanced-stats'
+                  ? 'border-red-500 text-red-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <ChartBarIcon className="w-5 h-5 inline mr-2" />
+              Estadísticas Avanzadas
+            </button>
           </nav>
         </div>
 
@@ -377,6 +389,10 @@ const TIDashboard = () => {
                 getRoleColor: auditLogger.getRoleColor
               }}
             />
+          )}
+
+          {activeTab === 'advanced-stats' && (
+            <AdvancedDashboard />
           )}
         </div>
       </div>
