@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from app.core.database import get_db, engine, create_tables
-from app.routers import user_router, role_router, document_router, hours_router, auth, dashboard
+from app.routers import user_router, role_router, document_router, hours_router, auth, dashboard, file_manager, reports_stats, dashboard_stats, system_monitor
 from dotenv import load_dotenv
 import os
 
@@ -28,6 +28,10 @@ app.include_router(user_router.router)  # CRUD usuarios
 app.include_router(role_router.router)  # CRUD roles
 app.include_router(document_router.router)  # CRUD documentos
 app.include_router(hours_router.router)  # CRUD horas
+app.include_router(file_manager.router)  # Gestión de archivos
+app.include_router(reports_stats.router)  # Reportes estadísticos
+app.include_router(dashboard_stats.router)  # Dashboard dinámico
+app.include_router(system_monitor.router)  # Monitoreo del sistema
 
 @app.get("/")
 async def root():
