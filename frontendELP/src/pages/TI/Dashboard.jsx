@@ -8,11 +8,14 @@ import {
   ShieldCheckIcon,
   ServerIcon,
   ExclamationTriangleIcon,
-  CheckCircleIcon
+  CheckCircleIcon,
+  MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
+import SearchableDataView from '../../components/common/SearchableDataView';
 
 const TIDashboard = () => {
   const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('overview');
   const [stats, setStats] = useState({
     systemUptime: 0,
     activeUsers: 0,
@@ -224,6 +227,112 @@ const TIDashboard = () => {
               Esta semana
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Pestañas de navegación - Panel TI */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="border-b border-gray-200">
+          <nav className="-mb-px flex space-x-8 px-6" aria-label="Tabs">
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'overview'
+                  ? 'border-red-500 text-red-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <ChartBarIcon className="w-5 h-5 inline mr-2" />
+              Monitor Sistema
+            </button>
+            <button
+              onClick={() => setActiveTab('users')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'users'
+                  ? 'border-red-500 text-red-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <UsersIcon className="w-5 h-5 inline mr-2" />
+              Usuarios Activos
+            </button>
+            <button
+              onClick={() => setActiveTab('logs')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'logs'
+                  ? 'border-red-500 text-red-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <ServerIcon className="w-5 h-5 inline mr-2" />
+              Logs del Sistema
+            </button>
+            <button
+              onClick={() => setActiveTab('search')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'search'
+                  ? 'border-red-500 text-red-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <MagnifyingGlassIcon className="w-5 h-5 inline mr-2" />
+              Auditoría de Acceso
+            </button>
+          </nav>
+        </div>
+
+        {/* Contenido de las pestañas */}
+        <div className="p-6">
+          {activeTab === 'overview' && (
+            <div className="space-y-6">
+              <h3 className="text-lg font-semibold text-gray-900">Monitor del Sistema en Tiempo Real</h3>
+              <p className="text-gray-600">Estado de servicios, alertas críticas y rendimiento del sistema.</p>
+              
+              {/* Estado de servicios */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {Object.entries(systemStatus).map(([service, status]) => (
+                  <div key={service} className="p-4 border rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium capitalize">{service}</span>
+                      <span className={`px-2 py-1 text-xs rounded-full ${
+                        status === 'online' ? 'bg-green-100 text-green-800' :
+                        status === 'warning' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {status}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'users' && (
+            <SearchableDataView
+              dataType="users"
+              title="Usuarios Activos del Sistema"
+              onView={(item) => console.log('Ver usuario:', item)}
+              showActions={false}
+            />
+          )}
+
+          {activeTab === 'logs' && (
+            <SearchableDataView
+              dataType="logs"
+              title="Logs y Eventos del Sistema"
+              onView={(item) => console.log('Ver log:', item)}
+              showActions={false}
+            />
+          )}
+
+          {activeTab === 'search' && (
+            <SearchableDataView
+              dataType="documents"
+              title="Auditoría de Acceso - Historial Completo"
+              onView={(item) => console.log('Ver elemento:', item)}
+            />
+          )}
         </div>
       </div>
 

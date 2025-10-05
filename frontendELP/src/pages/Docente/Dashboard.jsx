@@ -7,10 +7,12 @@ import {
   BookOpenIcon,
   CalendarDaysIcon,
   PresentationChartLineIcon,
-  ArrowDownTrayIcon
+  ArrowDownTrayIcon,
+  MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
 import InteractiveCharts from '../../components/common/InteractiveCharts';
 import ExportReports from '../../components/common/ExportReports';
+import SearchableDataView from '../../components/common/SearchableDataView';
 
 const DocenteDashboard = () => {
   const { user } = useAuth();
@@ -22,6 +24,7 @@ const DocenteDashboard = () => {
   });
   const [showExportModal, setShowExportModal] = useState(false);
   const [dashboardData, setDashboardData] = useState(null);
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'documents', 'hours'
 
   useEffect(() => {
     setTimeout(() => {
@@ -236,6 +239,115 @@ const DocenteDashboard = () => {
               Este mes
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Pestañas de navegación */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="border-b border-gray-200">
+          <nav className="-mb-px flex space-x-8 px-6" aria-label="Tabs">
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'overview'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <ChartBarIcon className="w-5 h-5 inline mr-2" />
+              Resumen
+            </button>
+            <button
+              onClick={() => setActiveTab('documents')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'documents'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <DocumentTextIcon className="w-5 h-5 inline mr-2" />
+              Mis Documentos
+            </button>
+            <button
+              onClick={() => setActiveTab('hours')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'hours'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <ClockIcon className="w-5 h-5 inline mr-2" />
+              Mis Horas
+            </button>
+            <button
+              onClick={() => setActiveTab('search')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'search'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <MagnifyingGlassIcon className="w-5 h-5 inline mr-2" />
+              Búsqueda Avanzada
+            </button>
+          </nav>
+        </div>
+
+        {/* Contenido de las pestañas */}
+        <div className="p-6">
+          {activeTab === 'overview' && (
+            <div className="space-y-6">
+              <h3 className="text-lg font-semibold text-gray-900">Vista General</h3>
+              <p className="text-gray-600">Resumen de tu actividad académica y documentos recientes.</p>
+              
+              {/* Documentos recientes */}
+              <div>
+                <h4 className="text-md font-medium text-gray-900 mb-4">Documentos Recientes</h4>
+                <div className="space-y-3">
+                  {/* Aquí irían los documentos recientes */}
+                  <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <DocumentTextIcon className="h-6 w-6 text-blue-500" />
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">Plan de Estudios 2024</p>
+                        <p className="text-xs text-gray-500">Planificación • Hace 2 días</p>
+                      </div>
+                    </div>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      Aprobado
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'documents' && (
+            <SearchableDataView
+              dataType="documents"
+              title="Mis Documentos"
+              onView={(item) => console.log('Ver documento:', item)}
+              onEdit={(item) => console.log('Editar documento:', item)}
+            />
+          )}
+
+          {activeTab === 'hours' && (
+            <SearchableDataView
+              dataType="hours"
+              title="Mis Horas Registradas"
+              onView={(item) => console.log('Ver horas:', item)}
+              onEdit={(item) => console.log('Editar horas:', item)}
+            />
+          )}
+
+          {activeTab === 'search' && (
+            <SearchableDataView
+              dataType="documents"
+              title="Búsqueda Avanzada - Todos mis Datos"
+              onView={(item) => console.log('Ver elemento:', item)}
+              onEdit={(item) => console.log('Editar elemento:', item)}
+            />
+          )}
         </div>
       </div>
 

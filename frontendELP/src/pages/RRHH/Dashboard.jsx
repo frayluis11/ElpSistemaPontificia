@@ -6,13 +6,16 @@ import {
   ClockIcon,
   ChartBarIcon,
   BriefcaseIcon,
-  ArrowDownTrayIcon
+  ArrowDownTrayIcon,
+  MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
 import InteractiveCharts from '../../components/common/InteractiveCharts';
 import ExportReports from '../../components/common/ExportReports';
+import SearchableDataView from '../../components/common/SearchableDataView';
 
 const RRHHDashboard = () => {
   const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('overview');
   const [stats, setStats] = useState({
     totalEmployees: 0,
     newHires: 0,
@@ -217,22 +220,103 @@ const RRHHDashboard = () => {
         </div>
       </div>
 
-      {/* Gráficos Interactivos para RRHH */}
-      {dashboardData && (
-        <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Análisis de Recursos Humanos</h2>
-            <div className="flex items-center space-x-2 text-sm text-gray-500">
-              <ChartBarIcon className="w-4 h-4" />
-              <span>Datos del personal y gestión</span>
-            </div>
-          </div>
-          <InteractiveCharts 
-            dashboardData={dashboardData} 
-            userRole="rrhh" 
-          />
+      {/* Pestañas de navegación - Panel RRHH */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="border-b border-gray-200">
+          <nav className="-mb-px flex space-x-8 px-6" aria-label="Tabs">
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'overview'
+                  ? 'border-red-500 text-red-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <ChartBarIcon className="w-5 h-5 inline mr-2" />
+              Panel General
+            </button>
+            <button
+              onClick={() => setActiveTab('staff')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'staff'
+                  ? 'border-red-500 text-red-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <UsersIcon className="w-5 h-5 inline mr-2" />
+              Personal
+            </button>
+            <button
+              onClick={() => setActiveTab('hours')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'hours'
+                  ? 'border-red-500 text-red-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <ClockIcon className="w-5 h-5 inline mr-2" />
+              Control de Horas
+            </button>
+            <button
+              onClick={() => setActiveTab('search')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'search'
+                  ? 'border-red-500 text-red-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <MagnifyingGlassIcon className="w-5 h-5 inline mr-2" />
+              Búsqueda Personal
+            </button>
+          </nav>
         </div>
-      )}
+
+        {/* Contenido de las pestañas */}
+        <div className="p-6">
+          {activeTab === 'overview' && dashboardData && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-semibold text-gray-900">Análisis de Recursos Humanos</h3>
+                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                  <ChartBarIcon className="w-4 h-4" />
+                  <span>Datos del personal y gestión</span>
+                </div>
+              </div>
+              <InteractiveCharts 
+                dashboardData={dashboardData} 
+                userRole="rrhh" 
+              />
+            </div>
+          )}
+
+          {activeTab === 'staff' && (
+            <SearchableDataView
+              dataType="staff"
+              title="Gestión de Personal - Vista RRHH"
+              onView={(item) => console.log('Ver empleado:', item)}
+              onEdit={(item) => console.log('Editar empleado:', item)}
+            />
+          )}
+
+          {activeTab === 'hours' && (
+            <SearchableDataView
+              dataType="hours"
+              title="Control de Horas del Personal"
+              onView={(item) => console.log('Ver horas:', item)}
+              showActions={false}
+            />
+          )}
+
+          {activeTab === 'search' && (
+            <SearchableDataView
+              dataType="documents"
+              title="Búsqueda Avanzada - Datos de Personal"
+              onView={(item) => console.log('Ver elemento:', item)}
+              onEdit={(item) => console.log('Editar elemento:', item)}
+            />
+          )}
+        </div>
+      </div>
 
       {/* Acciones rápidas */}
       <div className="bg-white shadow-lg rounded-lg p-6">
