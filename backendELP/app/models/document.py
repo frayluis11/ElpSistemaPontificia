@@ -1,9 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
-
-Base = declarative_base()
+from ..core.database import Base
 
 class Document(Base):
     __tablename__ = "documents"

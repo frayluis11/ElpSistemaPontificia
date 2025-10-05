@@ -1,9 +1,7 @@
 from sqlalchemy import Column, Integer, Date, Float, ForeignKey, Text, DateTime
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
-
-Base = declarative_base()
+from ..core.database import Base
 
 class Hours(Base):
     __tablename__ = "hours"

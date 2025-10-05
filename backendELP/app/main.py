@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import text
-from app.core.database import get_db, engine
+from app.core.database import get_db, engine, create_tables
+from app.routers import user_router, role_router, document_router, hours_router
 from dotenv import load_dotenv
 import os
 
@@ -14,6 +15,17 @@ app = FastAPI(
     description="Backend del Sistema ELP Pontificia con FastAPI y PostgreSQL",
     version="1.0.0"
 )
+
+# Crear tablas al iniciar la aplicación
+@app.on_event("startup")
+async def startup_event():
+    create_tables()
+
+# Incluir routers
+app.include_router(user_router.router)
+app.include_router(role_router.router)
+app.include_router(document_router.router)
+app.include_router(hours_router.router)
 
 @app.get("/")
 async def root():

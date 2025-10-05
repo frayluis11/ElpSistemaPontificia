@@ -26,6 +26,16 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 # Base para los modelos
 Base = declarative_base()
 
+# Importar modelos para que se registren con Base
+from app.models.user import User
+from app.models.role import Role
+from app.models.document import Document
+from app.models.hours import Hours
+
+# Crear todas las tablas
+def create_tables():
+    Base.metadata.create_all(bind=engine)
+
 # Dependency para obtener la sesión de base de datos
 def get_db():
     db = SessionLocal()
