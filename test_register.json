@@ -1,0 +1,8 @@
+{
+    "nombre": "Juan Carlos",
+    "apellido": "Rodriguez",
+    "dni": "12345678",
+    "correo_institucional": "juan.rodriguez@elp.edu.pe",
+    "contraseña": "password123",
+    "rol_nombre": "Docente"
+}
