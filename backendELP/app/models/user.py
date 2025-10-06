@@ -1,10 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-from passlib.context import CryptContext
 from datetime import datetime
 from ..core.database import Base
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class User(Base):
     __tablename__ = "users"
@@ -26,12 +23,14 @@ class User(Base):
     
     def verificar_contraseña(self, contraseña: str) -> bool:
         """Verifica si la contraseña proporcionada coincide con el hash almacenado"""
-        return pwd_context.verify(contraseña, self.contraseña_hash)
+        from ..core.security import verify_password
+        return verify_password(contraseña, self.contraseña_hash)
     
     @staticmethod
     def generar_hash_contraseña(contraseña: str) -> str:
         """Genera un hash seguro de la contraseña"""
-        return pwd_context.hash(contraseña)
+        from ..core.security import get_password_hash
+        return get_password_hash(contraseña)
     
     def __repr__(self):
         return f"<User(id={self.id}, nombre='{self.nombre}', apellido='{self.apellido}', dni='{self.dni}')>"

@@ -1,0 +1,8 @@
+{
+    "nombre": "Juan",
+    "apellido": "Pérez", 
+    "dni": "12345678",
+    "correo_institucional": "juan.perez@elp.edu.pe",
+    "contraseña": "password123",
+    "rol_nombre": "Administración"
+}

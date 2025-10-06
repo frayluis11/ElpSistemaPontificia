@@ -1,0 +1,2 @@
+INSERT INTO users (nombre, apellido, dni, correo_institucional, contraseña_hash, rol_id) 
+VALUES ('Admin', 'Sistema', '12345678', 'admin@pontificia.edu', '$2b$12$wJcmRoYfDYeswNVFKlwbRefwto69Vq8Mv7KRUnGy/s7SGGW3iA6ui', 5);

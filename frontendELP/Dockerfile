@@ -1,20 +1,27 @@
-# Usar Node.js 18 como imagen base para build
-FROM node:18-alpine AS build
+# Usar Node.js 20 como imagen base para build (Vite requiere Node 20.19+)
+FROM node:20-alpine AS build
 
 # Establecer directorio de trabajo
 WORKDIR /app
 
+# Aumentar memoria de Node.js para evitar heap overflow
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
 # Copiar package.json y package-lock.json
 COPY package*.json ./
 
-# Instalar dependencias
-RUN npm ci --only=production
+# Limpiar cache e instalar dependencias
+RUN npm cache clean --force && \
+    rm -rf node_modules package-lock.json && \
+    npm install
 
 # Copiar código fuente
 COPY . .
 
-# Construir la aplicación
-RUN npm run build
+# Forzar la instalación completa y build
+RUN rm -rf node_modules package-lock.json && \
+    npm install && \
+    npm run build
 
 # Etapa de producción con nginx
 FROM nginx:alpine AS production

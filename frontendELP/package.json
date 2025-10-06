@@ -5,8 +5,8 @@
   "type": "module",
   "description": "Frontend del Sistema ELP Pontificia desarrollado con React, Vite y Tailwind CSS",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "NODE_OPTIONS=--max-old-space-size=4096 vite",
+    "build": "NODE_OPTIONS=--max-old-space-size=4096 vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
