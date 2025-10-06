@@ -5,8 +5,8 @@
   "type": "module",
   "description": "Frontend del Sistema ELP Pontificia desarrollado con React, Vite y Tailwind CSS",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "NODE_OPTIONS=--max-old-space-size=4096 vite",
+    "build": "NODE_OPTIONS=--max-old-space-size=4096 vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -16,8 +16,10 @@
     "@tailwindcss/postcss": "^4.1.14",
     "axios": "^1.12.2",
     "chart.js": "^4.5.0",
+    "date-fns": "^4.1.0",
     "fabric": "^6.7.1",
     "file-saver": "^2.0.5",
+    "html2canvas": "^1.4.1",
     "jspdf": "^3.0.3",
     "jspdf-autotable": "^5.0.2",
     "jwt-decode": "^4.0.0",
@@ -28,6 +30,7 @@
     "react-router-dom": "^7.9.3",
     "react-signature-canvas": "^1.1.0-alpha.2",
     "react-toastify": "^11.0.5",
+    "recharts": "^3.2.1",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

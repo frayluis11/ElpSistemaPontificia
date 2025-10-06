@@ -24,7 +24,7 @@ pytest-cov==4.1.0
 
 # Security and code quality
 bandit==1.7.6
-safety==3.0.1
+# safety==3.0.1  # Comentado debido a conflicto con pydantic 2.x
 flake8==6.0.0
 black==23.12.1
 isort==5.12.0

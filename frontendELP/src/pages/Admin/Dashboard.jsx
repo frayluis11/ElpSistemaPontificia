@@ -13,15 +13,20 @@ import {
   ClipboardDocumentCheckIcon,
   BellAlertIcon,
   ArrowDownTrayIcon,
-  MagnifyingGlassIcon
+  MagnifyingGlassIcon,
+  ShieldCheckIcon
 } from '@heroicons/react/24/outline';
 import axios from 'axios';
 import InteractiveCharts from '../../components/common/InteractiveCharts';
 import ExportReports from '../../components/common/ExportReports';
 import SearchableDataView from '../../components/common/SearchableDataView';
+import DocumentManager from '../../components/common/DocumentManager';
+import { AuditLogger, AuditLogViewer } from '../../components/common/AuditLogger';
+import AdvancedDashboard from '../../components/common/Dashboard';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
+  const auditLogger = AuditLogger();
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalDocuments: 0,
@@ -497,6 +502,39 @@ const AdminDashboard = () => {
               <MagnifyingGlassIcon className="w-5 h-5 inline mr-2" />
               Búsqueda Completa
             </button>
+            <button
+              onClick={() => setActiveTab('signatures')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'signatures'
+                  ? 'border-red-500 text-red-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <PencilSquareIcon className="w-5 h-5 inline mr-2" />
+              Firmas Digitales
+            </button>
+            <button
+              onClick={() => setActiveTab('audit')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'audit'
+                  ? 'border-red-500 text-red-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <ShieldCheckIcon className="w-5 h-5 inline mr-2" />
+              Auditoría
+            </button>
+            <button
+              onClick={() => setActiveTab('advanced-stats')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'advanced-stats'
+                  ? 'border-red-500 text-red-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <ChartBarIcon className="w-5 h-5 inline mr-2" />
+              Estadísticas Avanzadas
+            </button>
           </nav>
         </div>
 
@@ -555,6 +593,29 @@ const AdminDashboard = () => {
               onEdit={(item) => console.log('Editar elemento:', item)}
               onDelete={(item) => console.log('Eliminar elemento:', item)}
             />
+          )}
+
+          {activeTab === 'signatures' && (
+            <DocumentManager />
+          )}
+
+          {activeTab === 'audit' && (
+            <AuditLogViewer
+              logs={auditLogger.auditLogs}
+              filters={auditLogger.filters}
+              onFiltersChange={auditLogger.setFilters}
+              uniqueUsers={auditLogger.uniqueUsers}
+              utilities={{
+                getActionIcon: auditLogger.getActionIcon,
+                getActionColor: auditLogger.getActionColor,
+                getActionLabel: auditLogger.getActionLabel,
+                getRoleColor: auditLogger.getRoleColor
+              }}
+            />
+          )}
+
+          {activeTab === 'advanced-stats' && (
+            <AdvancedDashboard />
           )}
         </div>
       </div>

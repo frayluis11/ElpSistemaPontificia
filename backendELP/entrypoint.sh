@@ -5,7 +5,7 @@ set -e
 wait_for_postgres() {
     echo "Esperando a que PostgreSQL esté listo..."
     
-    while ! pg_isready -h "${DB_HOST:-localhost}" -p "5432" -U "${DB_USER:-postgres}"; do
+    while ! pg_isready -h "${DB_HOST:-db}" -p "5432" -U "${DB_USER:-postgres}"; do
         echo "PostgreSQL no está listo - esperando..."
         sleep 2
     done

@@ -1,0 +1,107 @@
+services:
+  # Servicio PostgreSQL
+  db:
+    image: postgres:15-alpine
+    container_name: elp-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_secure_2024!
+      POSTGRES_DB: sistemaelp_db
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backendELP/init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - elp-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d sistemaelp_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Servicio Backend FastAPI
+  backend:
+    build: 
+      context: ./backendELP
+      dockerfile: Dockerfile
+    container_name: elp-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres_secure_2024!
+      - DB_NAME=sistemaelp_db
+      - SECRET_KEY=your-super-secret-key-change-in-production-2024!
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8000
+      - DEBUG=False
+      - UPLOAD_DIR=uploads
+      - MAX_FILE_SIZE=10485760
+      - LOG_LEVEL=INFO
+      - LOG_FILE=logs/app.log
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backendELP/uploads:/app/uploads
+      - ./backendELP/logs:/app/logs
+    networks:
+      - elp-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Servicio Frontend React + Nginx
+  frontend:
+    build: 
+      context: ./frontendELP
+      dockerfile: Dockerfile
+    container_name: elp-frontend
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    networks:
+      - elp-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Adminer para administración de base de datos
+  adminer:
+    image: adminer:4.8.1
+    container_name: elp-adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - elp-network
+    restart: unless-stopped
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+
+volumes:
+  postgres_data:
+
+networks:
+  elp-network:
+    driver: bridge

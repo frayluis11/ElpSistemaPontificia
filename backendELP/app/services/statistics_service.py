@@ -22,7 +22,7 @@ class StatisticsService:
         # Conteos básicos
         total_users = self.db.query(User).count()
         total_documents = self.db.query(Document).count()
-        total_hours = self.db.query(func.sum(Hours.horas_dictadas)).scalar() or 0
+        total_hours = self.db.query(func.sum(Hours.horas_totales)).scalar() or 0
         
         # Documentos por estado
         docs_by_status = self.db.query(
@@ -69,7 +69,7 @@ class StatisticsService:
             "resumen": {
                 "total_usuarios": total_users,
                 "total_documentos": total_documents,
-                "total_horas_dictadas": float(total_hours),
+                "total_horas_trabajadas": float(total_hours),
                 "actividad_reciente": recent_activity
             },
             "documentos_por_estado": docs_status_dict,
@@ -92,13 +92,13 @@ class StatisticsService:
         
         # Horas por docente (top 10)
         hours_by_teacher = self.db.query(
-            User.nombre, User.apellido, func.sum(Hours.horas_dictadas)
+            User.nombre, User.apellido, func.sum(Hours.horas_totales)
         ).join(Hours, User.id == Hours.usuario_id).join(
             Role, User.rol_id == Role.id
         ).filter(
             Role.nombre_rol == "Docente"
         ).group_by(User.id, User.nombre, User.apellido).order_by(
-            desc(func.sum(Hours.horas_dictadas))
+            desc(func.sum(Hours.horas_totales))
         ).limit(10).all()
         
         teachers_hours = [{
@@ -389,3 +389,95 @@ class StatisticsService:
             })
         
         return alerts
+
+    def get_hours_stats(self):
+        """Estadísticas completas de horas trabajadas"""
+        from datetime import datetime, timedelta
+        
+        # Estadísticas generales
+        total_hours = self.db.query(func.sum(Hours.horas_totales)).scalar() or 0
+        total_records = self.db.query(Hours).count()
+        avg_hours_per_day = total_hours / total_records if total_records > 0 else 0
+        
+        # Horas del mes actual
+        current_month = datetime.now().replace(day=1)
+        next_month = (current_month + timedelta(days=32)).replace(day=1)
+        
+        monthly_hours = self.db.query(func.sum(Hours.horas_totales)).filter(
+            Hours.fecha >= current_month.date(),
+            Hours.fecha < next_month.date()
+        ).scalar() or 0
+        
+        # Top usuarios por horas trabajadas
+        top_users = self.db.query(
+            User.nombre, User.apellido, func.sum(Hours.horas_totales)
+        ).join(Hours, User.id == Hours.usuario_id).group_by(
+            User.id, User.nombre, User.apellido
+        ).order_by(desc(func.sum(Hours.horas_totales))).limit(10).all()
+        
+        top_users_data = [{
+            "usuario": f"{nombre} {apellido}",
+            "total_horas": float(horas or 0)
+        } for nombre, apellido, horas in top_users]
+        
+        return {
+            "resumen": {
+                "total_horas": float(total_hours),
+                "total_registros": total_records,
+                "promedio_horas_dia": round(avg_hours_per_day, 2),
+                "horas_mes_actual": float(monthly_hours)
+            },
+            "top_usuarios": top_users_data,
+            "fecha_actualizacion": datetime.now().isoformat()
+        }
+
+    def get_user_hours_stats(self, user_id: int):
+        """Estadísticas de horas para un usuario específico"""
+        from datetime import datetime, timedelta
+        
+        # Horas totales del usuario
+        total_hours = self.db.query(func.sum(Hours.horas_totales)).filter(
+            Hours.usuario_id == user_id
+        ).scalar() or 0
+        
+        total_days = self.db.query(Hours).filter(
+            Hours.usuario_id == user_id
+        ).count()
+        
+        avg_hours = total_hours / total_days if total_days > 0 else 0
+        
+        # Horas del mes actual
+        current_month = datetime.now().replace(day=1)
+        next_month = (current_month + timedelta(days=32)).replace(day=1)
+        
+        monthly_hours = self.db.query(func.sum(Hours.horas_totales)).filter(
+            Hours.usuario_id == user_id,
+            Hours.fecha >= current_month.date(),
+            Hours.fecha < next_month.date()
+        ).scalar() or 0
+        
+        # Últimos 7 días
+        last_week = datetime.now().date() - timedelta(days=7)
+        recent_hours = self.db.query(func.sum(Hours.horas_totales)).filter(
+            Hours.usuario_id == user_id,
+            Hours.fecha >= last_week
+        ).scalar() or 0
+        
+        # Datos del usuario
+        user = self.db.query(User).filter(User.id == user_id).first()
+        user_name = f"{user.nombre} {user.apellido}" if user else "Usuario desconocido"
+        
+        return {
+            "usuario": {
+                "id": user_id,
+                "nombre": user_name
+            },
+            "estadisticas": {
+                "total_horas": float(total_hours),
+                "total_dias_trabajados": total_days,
+                "promedio_horas_dia": round(avg_hours, 2),
+                "horas_mes_actual": float(monthly_hours),
+                "horas_ultimos_7_dias": float(recent_hours)
+            },
+            "fecha_actualizacion": datetime.now().isoformat()
+        }

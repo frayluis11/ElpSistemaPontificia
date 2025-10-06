@@ -4,12 +4,13 @@ FROM python:3.13-slim
 # Establecer directorio de trabajo
 WORKDIR /app
 
-# Instalar dependencias del sistema necesarias para PostgreSQL y psutil
+# Instalar dependencias del sistema necesarias para PostgreSQL, psutil y curl para healthcheck
 RUN apt-get update && apt-get install -y \
     gcc \
     libpq-dev \
     postgresql-client \
     procps \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Crear usuario no-root para seguridad

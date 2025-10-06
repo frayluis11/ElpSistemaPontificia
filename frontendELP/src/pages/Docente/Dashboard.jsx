@@ -8,11 +8,14 @@ import {
   CalendarDaysIcon,
   PresentationChartLineIcon,
   ArrowDownTrayIcon,
-  MagnifyingGlassIcon
+  MagnifyingGlassIcon,
+  PencilSquareIcon
 } from '@heroicons/react/24/outline';
 import InteractiveCharts from '../../components/common/InteractiveCharts';
 import ExportReports from '../../components/common/ExportReports';
 import SearchableDataView from '../../components/common/SearchableDataView';
+import DocumentManager from '../../components/common/DocumentManager';
+import AdvancedDashboard from '../../components/common/Dashboard';
 
 const DocenteDashboard = () => {
   const { user } = useAuth();
@@ -290,6 +293,28 @@ const DocenteDashboard = () => {
               <MagnifyingGlassIcon className="w-5 h-5 inline mr-2" />
               Búsqueda Avanzada
             </button>
+            <button
+              onClick={() => setActiveTab('signatures')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'signatures'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <PencilSquareIcon className="w-5 h-5 inline mr-2" />
+              Mis Firmas
+            </button>
+            <button
+              onClick={() => setActiveTab('advanced-stats')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'advanced-stats'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <ChartBarIcon className="w-5 h-5 inline mr-2" />
+              Estadísticas Avanzadas
+            </button>
           </nav>
         </div>
 
@@ -347,6 +372,14 @@ const DocenteDashboard = () => {
               onView={(item) => console.log('Ver elemento:', item)}
               onEdit={(item) => console.log('Editar elemento:', item)}
             />
+          )}
+
+          {activeTab === 'signatures' && (
+            <DocumentManager />
+          )}
+
+          {activeTab === 'advanced-stats' && (
+            <AdvancedDashboard />
           )}
         </div>
       </div>
